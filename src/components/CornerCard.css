@@ -1,0 +1,60 @@
+.corner-card {
+  position: relative;
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+}
+
+.corner-card--highlight {
+  background: var(--accent-tint);
+  border-color: var(--accent);
+}
+
+.corner-tick {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  pointer-events: none;
+}
+
+.corner-tick::before,
+.corner-tick::after {
+  content: '';
+  position: absolute;
+  background: var(--tick);
+}
+
+/* horizontal stroke */
+.corner-tick::before {
+  top: 5px;
+  left: 0;
+  width: 11px;
+  height: 1px;
+}
+
+/* vertical stroke */
+.corner-tick::after {
+  left: 5px;
+  top: 0;
+  width: 1px;
+  height: 11px;
+}
+
+.corner-tick--tl {
+  top: -6px;
+  left: -6px;
+}
+
+.corner-tick--tr {
+  top: -6px;
+  right: -6px;
+}
+
+.corner-tick--bl {
+  bottom: -6px;
+  left: -6px;
+}
+
+.corner-tick--br {
+  bottom: -6px;
+  right: -6px;
+}
