@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&display=swap">
+<style>
+body{margin:0;background:#e7e7ea;font-family:"Barlow",system-ui,sans-serif}
+* {box-sizing:border-box}
+::-webkit-scrollbar{width:0;height:0}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:28px 12px">
+<div style="width:412px;max-width:100%;height:860px;background:#f2f2f3;border-radius:22px;box-shadow:0 12px 32px rgba(43,43,45,0.22);overflow:hidden;position:relative;display:flex;flex-direction:column;border:1px solid #d4d4d7">
+
+  <div style="flex:1;overflow-y:auto;position:relative">
+
+  <!-- HOME -->
+  <sc-if value="{{isHome}}" hint-placeholder-val="{{ true }}">
+  <div style="padding:22px 20px 100px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+      <div style="font-family:'Barlow Condensed';font-weight:700;font-size:26px;color:#1d2d3d;letter-spacing:-0.01em">OddScout</div>
+      <button onClick="{{ goToPerfil }}" style="width:36px;height:36px;border-radius:50%;border:1px solid #d4d4d7;background:#eef6ff;color:#2c455d;font-family:'Barlow Condensed';font-weight:700;font-size:13px;cursor:pointer">JP</button>
+    </div>
+    <div style="font-size:13px;color:rgba(29,31,32,0.6);margin-bottom:20px">Compara as melhores odds em Portugal, em segundos.</div>
+
+    <div style="display:flex;gap:8px;overflow-x:auto;margin-bottom:26px;padding-bottom:2px">
+      <sc-for list="{{ sportsList }}" as="sp" hint-placeholder-count="3">
+        <button onClick="{{ sp.onSelect }}" style="flex:none;padding:8px 16px;border-radius:20px;border:1px solid #5980a6;background:transparent;color:#416180;font-family:'Barlow Condensed';font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap">{{ sp.name }}</button>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
+      <h2 style="margin:0;font-size:19px">Destaques de valor</h2>
+      <span style="font-size:11px;color:rgba(29,31,32,0.5)">segundo a nossa IA</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
+      <sc-for list="{{ destaqueEvents }}" as="ev" hint-placeholder-count="2">
+        <div onClick="{{ ev.onOpen }}" style="position:relative;border:1px solid rgba(29,31,32,0.16);padding:14px 14px 12px;cursor:pointer;background:transparent">
+          <i style="position:absolute;width:11px;height:11px;top:-6px;left:-6px;border-top:1px solid rgba(29,31,32,0.55);border-left:1px solid rgba(29,31,32,0.55)"></i>
+          <i style="position:absolute;width:11px;height:11px;top:-6px;right:-6px;border-top:1px solid rgba(29,31,32,0.55);border-right:1px solid rgba(29,31,32,0.55)"></i>
+          <i style="position:absolute;width:11px;height:11px;bottom:-6px;left:-6px;border-bottom:1px solid rgba(29,31,32,0.55);border-left:1px solid rgba(29,31,32,0.55)"></i>
+          <i style="position:absolute;width:11px;height:11px;bottom:-6px;right:-6px;border-bottom:1px solid rgba(29,31,32,0.55);border-right:1px solid rgba(29,31,32,0.55)"></i>
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <span style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;background:#f5f5f8;color:#424244;padding:3px 8px">{{ ev.competition }}</span>
+            <span style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;background:#eef6ff;color:#2c455d;padding:3px 8px">{{ ev.recMarket }}: {{ ev.recOutcome }} · +{{ ev.valueEdge }}pp</span>
+          </div>
+          <div style="font-family:'Barlow Condensed';font-weight:600;font-size:17px;margin-bottom:2px">{{ ev.matchup }}</div>
+          <div style="font-size:11px;color:rgba(29,31,32,0.55);margin-bottom:10px">{{ ev.dateLabel }}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:12px;color:rgba(29,31,32,0.7)">IA: <strong>{{ ev.predLine }}</strong></div>
+            <div style="font-family:'Barlow Condensed';font-weight:700;font-size:16px;color:#416180">{{ ev.bestOdd }} <span style="font-size:10px;color:rgba(29,31,32,0.5);font-family:Barlow;font-weight:400">@{{ ev.bestBook }}</span></div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
+      <h2 style="margin:0;font-size:19px">Próximos eventos</h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0">
+      <sc-for list="{{ upcomingEvents }}" as="ev" hint-placeholder-count="4">
+        <div onClick="{{ ev.onOpen }}" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(29,31,32,0.1);cursor:pointer">
+          <div>
+            <div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:#5980a6;margin-bottom:3px">{{ ev.sport }} · {{ ev.competition }}</div>
+            <div style="font-family:'Barlow Condensed';font-weight:600;font-size:15px">{{ ev.matchup }}</div>
+            <div style="font-size:11px;color:rgba(29,31,32,0.55)">{{ ev.dateLabel }}</div>
+          </div>
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:15px;color:#416180">{{ ev.bestOdd }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- EXPLORAR -->
+  <sc-if value="{{isExplorar}}" hint-placeholder-val="{{ false }}">
+  <div style="padding:22px 20px 100px">
+    <h2 style="margin:0 0 16px;font-size:22px">Explorar</h2>
+    <input value="{{ searchQuery }}" onChange="{{ onSearchChange }}" placeholder="Procurar equipa ou jogador" style="width:100%;min-height:40px;padding:8px 12px;font-size:14px;background:#e9e9ea;border:1px solid rgba(29,31,32,0.16);margin-bottom:20px" />
+
+    <sc-if value="{{ hasSearchQuery }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(29,31,32,0.5);margin-bottom:10px">{{ searchResultsCount }} resultado(s)</div>
+      <div style="display:flex;flex-direction:column;gap:0;margin-bottom:8px">
+        <sc-for list="{{ searchResults }}" as="ev" hint-placeholder-count="2">
+          <div onClick="{{ ev.onOpen }}" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(29,31,32,0.1);cursor:pointer">
+            <div>
+              <div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:#5980a6;margin-bottom:3px">{{ ev.sport }} · {{ ev.competition }}</div>
+              <div style="font-family:'Barlow Condensed';font-weight:600;font-size:15px">{{ ev.matchup }}</div>
+              <div style="font-size:11px;color:rgba(29,31,32,0.55)">{{ ev.dateLabel }}</div>
+            </div>
+            <div style="font-family:'Barlow Condensed';font-weight:700;font-size:15px;color:#416180">{{ ev.bestOdd }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hasNoSearchQuery }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
+      <h3 style="margin:0;font-size:15px">Melhores previsões da IA</h3>
+      <span style="font-size:11px;color:rgba(29,31,32,0.5)">ordenadas por confiança + valor</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:26px">
+      <sc-for list="{{ rankedPredictions }}" as="ev" hint-placeholder-count="4">
+        <div onClick="{{ ev.onOpen }}" style="position:relative;border:1px solid rgba(29,31,32,0.16);padding:12px 14px;cursor:pointer">
+          <i style="position:absolute;width:11px;height:11px;top:-6px;left:-6px;border-top:1px solid rgba(29,31,32,0.55);border-left:1px solid rgba(29,31,32,0.55)"></i>
+          <i style="position:absolute;width:11px;height:11px;bottom:-6px;right:-6px;border-bottom:1px solid rgba(29,31,32,0.55);border-right:1px solid rgba(29,31,32,0.55)"></i>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+            <span style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:#5980a6">{{ ev.sport }}</span>
+            <span style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;background:#f5f5f8;color:#424244;padding:3px 8px">Confiança {{ ev.confidence }}</span>
+          </div>
+          <div style="font-family:'Barlow Condensed';font-weight:600;font-size:15px;margin-bottom:4px">{{ ev.matchup }}</div>
+          <div style="font-size:11px;color:rgba(29,31,32,0.6);margin-bottom:6px">Melhor aposta: {{ ev.recMarket }} — {{ ev.recOutcome }}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:12px;color:rgba(29,31,32,0.7)">IA: <strong>{{ ev.predLine }}</strong></div>
+            <sc-if value="{{ ev.hasValue }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:11px;background:#eef6ff;color:#2c455d;padding:3px 8px">+{{ ev.valueEdge }}pp valor</span>
+            </sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-size:13px;font-weight:600;color:rgba(29,31,32,0.6);margin-bottom:10px">ou escolhe uma modalidade</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <sc-for list="{{ sportsList }}" as="sp" hint-placeholder-count="3">
+        <div onClick="{{ sp.onSelect }}" style="position:relative;border:1px solid rgba(29,31,32,0.16);padding:16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+          <i style="position:absolute;width:11px;height:11px;top:-6px;left:-6px;border-top:1px solid rgba(29,31,32,0.55);border-left:1px solid rgba(29,31,32,0.55)"></i>
+          <i style="position:absolute;width:11px;height:11px;bottom:-6px;right:-6px;border-bottom:1px solid rgba(29,31,32,0.55);border-right:1px solid rgba(29,31,32,0.55)"></i>
+          <div style="font-family:'Barlow Condensed';font-weight:600;font-size:18px">{{ sp.name }}</div>
+          <div style="font-size:12px;color:rgba(29,31,32,0.55)">{{ sp.count }} eventos</div>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <!-- EVENTOS LISTA -->
+  <sc-if value="{{isEventos}}" hint-placeholder-val="{{ false }}">
+  <div style="padding:22px 20px 100px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+      <button onClick="{{ goBack }}" style="width:32px;height:32px;border:1px solid rgba(29,31,32,0.16);background:transparent;cursor:pointer;font-size:16px;font-family:'Barlow Condensed'">←</button>
+      <h2 style="margin:0;font-size:20px">{{ selectedSport }}</h2>
+    </div>
+    <div style="font-size:12px;color:rgba(29,31,32,0.55);margin:0 0 18px 42px">{{ eventosListCount }} eventos</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{ eventosListView }}" as="ev" hint-placeholder-count="3">
+        <div onClick="{{ ev.onOpen }}" style="position:relative;border:1px solid rgba(29,31,32,0.16);padding:14px;cursor:pointer">
+          <i style="position:absolute;width:11px;height:11px;top:-6px;left:-6px;border-top:1px solid rgba(29,31,32,0.55);border-left:1px solid rgba(29,31,32,0.55)"></i>
+          <i style="position:absolute;width:11px;height:11px;bottom:-6px;right:-6px;border-bottom:1px solid rgba(29,31,32,0.55);border-right:1px solid rgba(29,31,32,0.55)"></i>
+          <div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:#5980a6;margin-bottom:4px">{{ ev.competition }}</div>
+          <div style="font-family:'Barlow Condensed';font-weight:600;font-size:16px;margin-bottom:6px">{{ ev.matchup }}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:11px;color:rgba(29,31,32,0.55)">{{ ev.dateLabel }}</div>
+            <div style="font-family:'Barlow Condensed';font-weight:700;font-size:15px;color:#416180">Melhor odd {{ ev.bestOdd }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- DETALHE -->
+  <sc-if value="{{isDetalhe}}" hint-placeholder-val="{{ false }}">
+  <div style="padding:22px 20px 100px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <button onClick="{{ goBack }}" style="width:32px;height:32px;border:1px solid rgba(29,31,32,0.16);background:transparent;cursor:pointer;font-size:16px;font-family:'Barlow Condensed'">←</button>
+      <button onClick="{{ toggleFavorite }}" style="border:1px solid rgba(29,31,32,0.16);background:transparent;cursor:pointer;font-size:13px;padding:7px 12px;font-family:'Barlow Condensed';font-weight:600;color:#416180">{{ favoriteLabel }}</button>
+    </div>
+
+    <div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:#5980a6;margin-bottom:6px">{{ eventSport }} · {{ eventCompetition }}</div>
+    <div style="font-family:'Barlow Condensed';font-weight:700;font-size:24px;margin-bottom:4px">{{ eventMatchup }}</div>
+    <div style="font-size:12px;color:rgba(29,31,32,0.55);margin-bottom:22px">{{ eventDateLabel }}</div>
+
+    <div style="position:relative;border:1px solid rgba(29,31,32,0.16);padding:16px;margin-bottom:22px">
+      <i style="position:absolute;width:11px;height:11px;top:-6px;left:-6px;border-top:1px solid rgba(29,31,32,0.55);border-left:1px solid rgba(29,31,32,0.55)"></i>
+      <i style="position:absolute;width:11px;height:11px;top:-6px;right:-6px;border-top:1px solid rgba(29,31,32,0.55);border-right:1px solid rgba(29,31,32,0.55)"></i>
+      <i style="position:absolute;width:11px;height:11px;bottom:-6px;left:-6px;border-bottom:1px solid rgba(29,31,32,0.55);border-left:1px solid rgba(29,31,32,0.55)"></i>
+      <i style="position:absolute;width:11px;height:11px;bottom:-6px;right:-6px;border-bottom:1px solid rgba(29,31,32,0.55);border-right:1px solid rgba(29,31,32,0.55)"></i>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-family:'Barlow Condensed';font-weight:600;font-size:16px">Previsão IA</div>
+        <span style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;background:#f5f5f8;color:#424244;padding:3px 8px">Confiança {{ predConfidence }}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
+        <sc-for list="{{ predBars }}" as="b" hint-placeholder-count="2">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>{{ b.label }}</span><strong>{{ b.pct }}%</strong></div>
+            <div style="height:6px;background:#e9e9ea;position:relative">
+              <div style="height:6px;background:#5980a6;width:{{ b.pct }}%"></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-size:12px;color:rgba(29,31,32,0.6);line-height:1.5">Baseado em forma recente, histórico direto e estatísticas da época.</div>
+    </div>
+
+    <div style="position:relative;border:1px solid #5980a6;padding:16px;margin-bottom:22px;background:#eef6ff">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:#2c455d">Aposta recomendada pela IA</div>
+        <sc-if value="{{ hasValueBet }}" hint-placeholder-val="{{ false }}">
+          <span style="font-size:10px;letter-spacing:0.02em;background:#1d2d3d;color:#eef6ff;padding:2px 7px">+{{ valueEdge }}pp valor</span>
+        </sc-if>
+      </div>
+      <div style="font-size:11px;color:#416180;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:2px">{{ recMarket }}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-family:'Barlow Condensed';font-weight:700;font-size:19px;color:#1d2d3d">{{ recOutcome }}</div>
+        <div style="font-family:'Barlow Condensed';font-weight:700;font-size:19px;color:#2c455d">{{ recOdd }} <span style="font-size:11px;color:rgba(29,31,32,0.6);font-family:Barlow;font-weight:400">@{{ recBook }}</span></div>
+      </div>
+      <div style="font-size:12px;color:#1d1f20;line-height:1.55">{{ eventReasoning }}</div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:12px;color:rgba(29,31,32,0.55)">Melhor odd agora ({{ activeMarketName }})</div>
+      <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;color:#416180">{{ heroBestOdd }} <span style="font-size:11px;color:rgba(29,31,32,0.5);font-family:Barlow;font-weight:400">@{{ heroBestBook }}</span></div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;border:1px solid rgba(29,31,32,0.16);margin-bottom:16px;width:fit-content">
+      <sc-for list="{{ marketTabs }}" as="t" hint-placeholder-count="2">
+        <button onClick="{{ t.onSelect }}" style="padding:8px 12px;font-size:11px;font-family:'Barlow Condensed';font-weight:600;cursor:pointer;border:0;border-right:1px solid rgba(29,31,32,0.16);background:{{ t.bg }};color:{{ t.color }}">{{ t.name }}</button>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ hasVisibleBooks }}" hint-placeholder-val="{{ true }}">
+    <div style="overflow-x:auto;margin-bottom:18px">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:6px 4px;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(29,31,32,0.5);border-bottom:1px solid rgba(29,31,32,0.16)"></th>
+            <sc-for list="{{ visibleBookHeaders }}" as="bk" hint-placeholder-count="5">
+              <th style="text-align:center;padding:6px 4px;font-size:10px;letter-spacing:0.02em;color:rgba(29,31,32,0.6);border-bottom:1px solid rgba(29,31,32,0.16)">{{ bk }}</th>
+            </sc-for>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ activeMarketRows }}" as="row" hint-placeholder-count="2">
+            <tr>
+              <td style="padding:8px 4px;font-weight:600;border-bottom:1px solid rgba(29,31,32,0.08)">{{ row.label }}</td>
+              <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="5">
+                <td style="text-align:center;padding:8px 4px;border-bottom:1px solid rgba(29,31,32,0.08);background:{{ c.bg }};color:{{ c.color }};font-weight:{{ c.weight }}">{{ c.odd }}</td>
+              </sc-for>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    </sc-if>
+    <sc-if value="{{ hasNoVisibleBooks }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:12px;color:rgba(29,31,32,0.55);border:1px solid rgba(29,31,32,0.16);padding:14px;margin-bottom:18px">Nenhuma casa de apostas selecionada. Ativa casas em Perfil → Casas preferidas.</div>
+    </sc-if>
+
+    <div style="font-size:11px;color:rgba(29,31,32,0.5);line-height:1.5">As odds apresentadas são indicativas e podem variar até ao momento da aposta. Aposta com responsabilidade. Jogo proibido a menores de 18 anos.</div>
+  </div>
+  </sc-if>
+
+  <!-- COMBOS -->
+  <sc-if value="{{isCombos}}" hint-placeholder-val="{{ false }}">
+  <div style="padding:22px 20px 100px">
+    <h2 style="margin:0 0 4px;font-size:22px">Seguras &amp; Valor</h2>
+    <div style="font-size:12px;color:rgba(29,31,32,0.55);margin-bottom:20px">Zonas de apostas e construtor de combinados</div>
+
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+      <h3 style="margin:0;font-size:14px;color:#2c455d">🛡 Apostas Seguras</h3>
+      <span style="font-size:10px;color:rgba(29,31,32,0.5)">confiança IA ≥ 60%</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px">
+      <sc-for list="{{ safeBetsView }}" as="b" hint-placeholder-count="3">
+        <div onClick="{{ b.onOpen }}" style="display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(29,31,32,0.16);padding:10px 12px;cursor:pointer">
+          <div>
+            <div style="font-size:11px;color:rgba(29,31,32,0.55);margin-bottom:2px">{{ b.matchup }}</div>
+            <div style="font-family:'Barlow Condensed';font-weight:600;font-size:14px">{{ b.market }}: {{ b.outcome }}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:#2c455d;font-weight:600">{{ b.prob }}%</div>
+            <div style="font-family:'Barlow Condensed';font-weight:700;font-size:14px;color:#416180">{{ b.odd }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+      <h3 style="margin:0;font-size:14px;color:#2c455d">📈 Apostas de Valor</h3>
+      <span style="font-size:10px;color:rgba(29,31,32,0.5)">vantagem ≥ 5pp vs. mercado</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px">
+      <sc-for list="{{ valueBetsView }}" as="b" hint-placeholder-count="3">
+        <div onClick="{{ b.onOpen }}" style="display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(29,31,32,0.16);padding:10px 12px;cursor:pointer">
+          <div>
+            <div style="font-size:11px;color:rgba(29,31,32,0.55);margin-bottom:2px">{{ b.matchup }}</div>
+            <div style="font-family:'Barlow Condensed';font-weight:600;font-size:14px">{{ b.market }}: {{ b.outcome }}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:#2c455d;font-weight:600">+{{ b.edge }}pp</div>
+            <div style="font-family:'Barlow Condensed';font-weight:700;font-size:14px;color:#416180">{{ b.odd }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="position:relative;border:1px solid rgba(29,31,32,0.16);padding:16px">
+      <i style="position:absolute;width:11px;height:11px;top:-6px;left:-6px;border-top:1px solid rgba(29,31,32,0.55);border-left:1px solid rgba(29,31,32,0.55)"></i>
+      <i style="position:absolute;width:11px;height:11px;bottom:-6px;right:-6px;border-bottom:1px solid rgba(29,31,32,0.55);border-right:1px solid rgba(29,31,32,0.55)"></i>
+      <div style="font-family:'Barlow Condensed';font-weight:600;font-size:16px;margin-bottom:12px">Construtor de Combinados</div>
+
+      <div style="font-size:11px;color:rgba(29,31,32,0.55);margin-bottom:6px">Origem das apostas</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+        <sc-for list="{{ comboPoolOptions }}" as="op" hint-placeholder-count="4">
+          <button onClick="{{ op.onSelect }}" style="padding:7px 12px;border:1px solid {{ op.borderColor }};background:{{ op.bg }};color:{{ op.color }};font-family:'Barlow Condensed';font-weight:600;font-size:12px;cursor:pointer">{{ op.label }}</button>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-size:11px;color:rgba(29,31,32,0.55)">Número de apostas no combinado</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button onClick="{{ decComboCount }}" style="width:28px;height:28px;border:1px solid rgba(29,31,32,0.16);background:transparent;cursor:pointer;font-family:'Barlow Condensed';font-weight:700">−</button>
+          <span style="font-family:'Barlow Condensed';font-weight:700;font-size:16px;min-width:18px;text-align:center">{{ comboCount }}</span>
+          <button onClick="{{ incComboCount }}" style="width:28px;height:28px;border:1px solid rgba(29,31,32,0.16);background:transparent;cursor:pointer;font-family:'Barlow Condensed';font-weight:700">+</button>
+        </div>
+      </div>
+
+      <button onClick="{{ generateCombo }}" style="width:100%;background:#5980a6;color:#f2f2f3;border:1px solid #5980a6;padding:10px;font-family:'Barlow Condensed';font-weight:700;font-size:14px;cursor:pointer;margin-bottom:16px">Gerar combinado</button>
+
+      <sc-if value="{{ hasComboLegs }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+          <sc-for list="{{ comboLegs }}" as="leg" hint-placeholder-count="3">
+            <div style="border-bottom:1px solid rgba(29,31,32,0.1);padding-bottom:8px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+                <span style="font-size:11px;color:rgba(29,31,32,0.55)">{{ leg.event }}</span>
+                <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.04em;background:#f5f5f8;color:#424244;padding:2px 6px">{{ leg.tag }}</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="font-family:'Barlow Condensed';font-weight:600;font-size:14px">{{ leg.market }}: {{ leg.outcome }}</div>
+                <div style="font-family:'Barlow Condensed';font-weight:700;font-size:14px;color:#416180">{{ leg.odd }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:4px">
+          <div style="font-size:12px;color:rgba(29,31,32,0.6)">Odd total do combinado</div>
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;color:#2c455d">{{ comboTotalOdd }}</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hasNoComboLegs }}" hint-placeholder-val="{{ true }}">
+        <div style="font-size:12px;color:rgba(29,31,32,0.5)">Escolhe a origem e o número de apostas, depois toca em "Gerar combinado".</div>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- FAVORITOS -->
+  <sc-if value="{{isFavoritos}}" hint-placeholder-val="{{ false }}">
+  <div style="padding:22px 20px 100px">
+    <h2 style="margin:0 0 18px;font-size:22px">Favoritos</h2>
+    <sc-if value="{{ hasFavorites }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ favoritesView }}" as="ev" hint-placeholder-count="2">
+          <div onClick="{{ ev.onOpen }}" style="position:relative;border:1px solid rgba(29,31,32,0.16);padding:14px;cursor:pointer">
+            <i style="position:absolute;width:11px;height:11px;top:-6px;left:-6px;border-top:1px solid rgba(29,31,32,0.55);border-left:1px solid rgba(29,31,32,0.55)"></i>
+            <i style="position:absolute;width:11px;height:11px;bottom:-6px;right:-6px;border-bottom:1px solid rgba(29,31,32,0.55);border-right:1px solid rgba(29,31,32,0.55)"></i>
+            <div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:#5980a6;margin-bottom:4px">{{ ev.sport }} · {{ ev.competition }}</div>
+            <div style="font-family:'Barlow Condensed';font-weight:600;font-size:16px;margin-bottom:6px">{{ ev.matchup }}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:11px;color:rgba(29,31,32,0.55)">{{ ev.dateLabel }}</div>
+              <div style="font-family:'Barlow Condensed';font-weight:700;font-size:15px;color:#416180">{{ ev.bestOdd }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ hasNoFavorites }}" hint-placeholder-val="{{ true }}">
+      <div style="border:1px dashed rgba(29,31,32,0.25);padding:32px 20px;text-align:center">
+        <div style="font-size:13px;color:rgba(29,31,32,0.6);line-height:1.5">Ainda sem favoritos.<br/>Toca em "☆ Favoritar" num evento para o guardar aqui.</div>
+      </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <!-- PERFIL -->
+  <sc-if value="{{isPerfil}}" hint-placeholder-val="{{ false }}">
+  <div style="padding:22px 20px 100px">
+    <h2 style="margin:0 0 20px;font-size:22px">Perfil</h2>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:26px">
+      <div style="width:52px;height:52px;border-radius:50%;background:#eef6ff;color:#2c455d;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-weight:700;font-size:16px">JP</div>
+      <div>
+        <div style="font-family:'Barlow Condensed';font-weight:600;font-size:16px">João Pereira</div>
+        <div style="font-size:12px;color:rgba(29,31,32,0.55)">joao.pereira@email.com</div>
+      </div>
+    </div>
+
+    <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:rgba(29,31,32,0.55);margin-bottom:10px">Casas de apostas preferidas</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px">
+      <sc-for list="{{ bookToggles }}" as="bk" hint-placeholder-count="5">
+        <button onClick="{{ bk.onToggle }}" style="padding:8px 14px;border:1px solid {{ bk.borderColor }};background:{{ bk.bg }};color:{{ bk.color }};font-family:'Barlow Condensed';font-weight:600;font-size:13px;cursor:pointer">{{ bk.name }}</button>
+      </sc-for>
+    </div>
+
+    <div style="position:relative;border:1px solid rgba(29,31,32,0.16);padding:16px;margin-bottom:22px">
+      <i style="position:absolute;width:11px;height:11px;top:-6px;left:-6px;border-top:1px solid rgba(29,31,32,0.55);border-left:1px solid rgba(29,31,32,0.55)"></i>
+      <i style="position:absolute;width:11px;height:11px;bottom:-6px;right:-6px;border-bottom:1px solid rgba(29,31,32,0.55);border-right:1px solid rgba(29,31,32,0.55)"></i>
+      <div style="font-family:'Barlow Condensed';font-weight:600;font-size:15px;margin-bottom:8px">Jogo Responsável</div>
+      <div style="font-size:12px;color:rgba(29,31,32,0.65);line-height:1.55;margin-bottom:12px">O jogo pode ser viciante. Define limites de tempo e valor, e joga sempre com moderação. Apoio: linha SICAD 1414.</div>
+      <button style="border:1px solid rgba(29,31,32,0.16);background:transparent;padding:8px 14px;font-family:'Barlow Condensed';font-weight:600;font-size:13px;cursor:pointer">Definir limites</button>
+    </div>
+
+    <button style="width:100%;border:1px solid rgba(29,31,32,0.16);background:transparent;padding:10px;font-family:'Barlow Condensed';font-weight:600;font-size:14px;cursor:pointer;color:#5d5d60">Terminar sessão</button>
+    <div style="text-align:center;font-size:11px;color:rgba(29,31,32,0.4);margin-top:16px">OddScout v1.0 · dados apenas ilustrativos</div>
+  </div>
+  </sc-if>
+
+  </div>
+
+  <!-- TAB BAR -->
+  <div style="display:flex;border-top:1px solid rgba(29,31,32,0.14);background:#f2f2f3">
+    <button onClick="{{ goToHome }}" style="flex:1;padding:12px 0 10px;background:transparent;border:0;cursor:pointer;font-family:'Barlow Condensed';font-weight:600;font-size:12px;color:{{ tabHomeColor }};border-top:2px solid {{ tabHomeBorder }}">Início</button>
+    <button onClick="{{ goToExplorar }}" style="flex:1;padding:12px 0 10px;background:transparent;border:0;cursor:pointer;font-family:'Barlow Condensed';font-weight:600;font-size:12px;color:{{ tabExplorarColor }};border-top:2px solid {{ tabExplorarBorder }}">Explorar</button>
+    <button onClick="{{ goToCombos }}" style="flex:1;padding:12px 0 10px;background:transparent;border:0;cursor:pointer;font-family:'Barlow Condensed';font-weight:600;font-size:11px;color:{{ tabCombosColor }};border-top:2px solid {{ tabCombosBorder }}">Combos</button>
+    <button onClick="{{ goToFavoritos }}" style="flex:1;padding:12px 0 10px;background:transparent;border:0;cursor:pointer;font-family:'Barlow Condensed';font-weight:600;font-size:12px;color:{{ tabFavoritosColor }};border-top:2px solid {{ tabFavoritosBorder }}">Favoritos</button>
+    <button onClick="{{ goToPerfil }}" style="flex:1;padding:12px 0 10px;background:transparent;border:0;cursor:pointer;font-family:'Barlow Condensed';font-weight:600;font-size:12px;color:{{ tabPerfilColor }};border-top:2px solid {{ tabPerfilBorder }}">Perfil</button>
+  </div>
+
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const BOOKMAKERS = ['Bet365','Betano','Betclic','Placard','Solverde'];
+
+function m(name, labels, predProbs, odds){ return { name, labels, predProbs, odds }; }
+
+const EVENTS = [
+  {id:'fb1', sport:'Futebol', competition:'Premier League', teamA:'Arsenal', teamB:'Coventry City', dateLabel:'21 Ago · 20:00', confidence:'Alta',
+    reasoning:'Estreia em casa do Arsenal diante de um recém-promovido; a diferença de qualidade de plantel é considerável.',
+    markets:[
+      m('Resultado Final', ['Arsenal','Empate','Coventry City'], [78,15,7], [[1.16,1.14,1.18,1.15,1.17],[6.50,6.20,6.80,6.40,6.60],[11.00,10.50,12.00,10.80,11.50]]),
+      m('+2.5 Golos', ['Mais de 2.5','Menos de 2.5'], [60,40], [[1.70,1.75,1.68,1.72,1.66],[2.10,2.05,2.15,2.08,2.20]]),
+      m('Ambas Marcam', ['Sim','Não'], [40,60], [[2.15,2.10,2.20,2.05,2.25],[1.65,1.68,1.62,1.70,1.60]]),
+      m('Golos 1ª Parte (0.5)', ['Mais de 0.5','Menos de 0.5'], [58,42], [[1.85,1.80,1.90,1.83,1.88],[1.95,2.00,1.90,1.98,1.92]])
+    ]},
+  {id:'fb2', sport:'Futebol', competition:'Premier League', teamA:'Newcastle United', teamB:'Liverpool', dateLabel:'23 Ago · 16:30', confidence:'Média',
+    reasoning:'Confronto direto entre duas equipas fortes; Liverpool ligeiro favorito fora, mas Newcastle é sempre difícil em St. James Park.',
+    markets:[
+      m('Resultado Final', ['Newcastle Utd','Empate','Liverpool'], [32,26,42], [[2.60,2.55,2.65,2.70,2.58],[3.40,3.30,3.50,3.45,3.35],[2.55,2.50,2.60,2.65,2.52]]),
+      m('+2.5 Golos', ['Mais de 2.5','Menos de 2.5'], [55,45], [[1.80,1.85,1.78,1.83,1.88],[2.00,1.95,2.05,1.98,1.92]]),
+      m('Ambas Marcam', ['Sim','Não'], [62,38], [[1.70,1.75,1.68,1.72,1.66],[2.10,2.05,2.15,2.08,2.20]]),
+      m('Golos 1ª Parte (0.5)', ['Mais de 0.5','Menos de 0.5'], [52,48], [[1.95,1.90,2.00,1.93,1.98],[1.90,1.95,1.85,1.92,1.88]])
+    ]},
+  {id:'fb3', sport:'Futebol', competition:'Serie A', teamA:'Inter de Milão', teamB:'Monza', dateLabel:'22 Ago · 20:45', confidence:'Alta',
+    reasoning:'Campeão em título recebe o promovido em casa; o Monza deve entrar retraído em San Siro.',
+    markets:[
+      m('Resultado Final', ['Inter de Milão','Empate','Monza'], [75,17,8], [[1.20,1.18,1.22,1.19,1.21],[6.00,5.80,6.20,5.90,6.10],[10.00,9.50,10.50,9.80,10.20]]),
+      m('+2.5 Golos', ['Mais de 2.5','Menos de 2.5'], [57,43], [[1.75,1.80,1.72,1.78,1.83],[2.05,2.00,2.10,2.03,1.98]]),
+      m('Ambas Marcam', ['Sim','Não'], [38,62], [[2.20,2.15,2.25,2.18,2.30],[1.62,1.65,1.60,1.63,1.58]]),
+      m('Golos 1ª Parte (0.5)', ['Mais de 0.5','Menos de 0.5'], [55,45], [[1.88,1.85,1.92,1.86,1.90],[1.92,1.95,1.88,1.94,1.90]])
+    ]},
+  {id:'fb4', sport:'Futebol', competition:'Serie A', teamA:'Frosinone', teamB:'Juventus', dateLabel:'23 Ago · 18:30', confidence:'Alta',
+    reasoning:'A Juventus é muito mais forte no papel diante de um recém-promovido a jogar fora de casa.',
+    markets:[
+      m('Resultado Final', ['Frosinone','Empate','Juventus'], [15,25,60], [[7.00,6.50,7.20,6.80,7.10],[4.10,4.00,4.20,4.05,4.15],[1.55,1.60,1.53,1.58,1.62]]),
+      m('+2.5 Golos', ['Mais de 2.5','Menos de 2.5'], [48,52], [[2.00,1.95,2.05,1.98,2.10],[1.80,1.85,1.75,1.83,1.78]]),
+      m('Ambas Marcam', ['Sim','Não'], [42,58], [[2.05,2.00,2.10,2.08,2.15],[1.72,1.75,1.68,1.70,1.65]]),
+      m('Golos 1ª Parte (0.5)', ['Mais de 0.5','Menos de 0.5'], [45,55], [[2.05,2.00,2.10,2.08,2.15],[1.75,1.78,1.72,1.76,1.70]])
+    ]},
+  {id:'fb5', sport:'Futebol', competition:'La Liga', teamA:'Espanyol', teamB:'Real Madrid', dateLabel:'26 Ago · 21:30', confidence:'Alta',
+    reasoning:'O Real Madrid entra na competição reforçado; o Espanyol costuma ser competitivo em casa mas falta-lhe qualidade individual.',
+    markets:[
+      m('Resultado Final', ['Espanyol','Empate','Real Madrid'], [15,20,65], [[6.00,5.80,6.20,5.90,6.10],[4.20,4.10,4.30,4.15,4.25],[1.55,1.52,1.58,1.54,1.60]]),
+      m('+2.5 Golos', ['Mais de 2.5','Menos de 2.5'], [50,50], [[1.95,1.90,2.00,1.93,1.98],[1.90,1.95,1.85,1.92,1.88]]),
+      m('Ambas Marcam', ['Sim','Não'], [48,52], [[1.92,1.88,1.95,1.90,1.98],[1.90,1.95,1.85,1.92,1.86]]),
+      m('Golos 1ª Parte (0.5)', ['Mais de 0.5','Menos de 0.5'], [47,53], [[2.00,1.95,2.05,1.98,2.10],[1.80,1.85,1.75,1.83,1.78]])
+    ]},
+  {id:'fb6', sport:'Futebol', competition:'Brasileirão Série A', teamA:'Palmeiras', teamB:'São Paulo', dateLabel:'Agosto 2026', confidence:'Média',
+    reasoning:'Palmeiras favorito em casa no Allianz Parque, mas o clássico paulista com o São Paulo é historicamente equilibrado.',
+    markets:[
+      m('Resultado Final', ['Palmeiras','Empate','São Paulo'], [45,28,27], [[2.05,2.00,2.10,2.08,2.12],[3.20,3.10,3.30,3.15,3.25],[3.60,3.50,3.70,3.55,3.65]]),
+      m('+2.5 Golos', ['Mais de 2.5','Menos de 2.5'], [46,54], [[2.10,2.05,2.15,2.08,2.20],[1.75,1.78,1.70,1.76,1.72]]),
+      m('Ambas Marcam', ['Sim','Não'], [55,45], [[1.80,1.85,1.78,1.82,1.88],[2.00,1.95,2.05,1.98,2.10]])
+    ]},
+  {id:'fb7', sport:'Futebol', competition:'Brasileirão Série A', teamA:'Flamengo', teamB:'Corinthians', dateLabel:'Agosto 2026', confidence:'Alta',
+    reasoning:'Flamengo joga no Maracanã em grande fase; o Corinthians tem sofrido fora de casa nesta época.',
+    markets:[
+      m('Resultado Final', ['Flamengo','Empate','Corinthians'], [55,26,19], [[1.75,1.70,1.80,1.73,1.78],[3.50,3.40,3.60,3.45,3.55],[4.60,4.50,4.70,4.55,4.65]]),
+      m('+2.5 Golos', ['Mais de 2.5','Menos de 2.5'], [52,48], [[1.90,1.85,1.95,1.88,1.98],[1.90,1.95,1.85,1.92,1.86]]),
+      m('Ambas Marcam', ['Sim','Não'], [50,50], [[1.90,1.85,1.95,1.92,1.98],[1.90,1.95,1.85,1.88,1.82]])
+    ]},
+  {id:'fb8', sport:'Futebol', competition:'Liga Profesional Argentina', teamA:'Boca Juniors', teamB:'Racing Club', dateLabel:'Agosto 2026', confidence:'Média',
+    reasoning:'Clássico equilibrado; Boca joga na Bombonera mas o Racing tem sido mais consistente esta fase.',
+    markets:[
+      m('Resultado Final', ['Boca Juniors','Empate','Racing Club'], [42,29,29], [[2.10,2.05,2.15,2.08,2.20],[3.10,3.00,3.20,3.05,3.15],[3.50,3.40,3.60,3.45,3.55]]),
+      m('+2.5 Golos', ['Mais de 2.5','Menos de 2.5'], [42,58], [[2.15,2.10,2.20,2.12,2.25],[1.70,1.75,1.65,1.72,1.68]]),
+      m('Ambas Marcam', ['Sim','Não'], [46,54], [[1.95,1.90,2.00,1.93,2.05],[1.85,1.90,1.80,1.87,1.82]])
+    ]},
+  {id:'fb9', sport:'Futebol', competition:'Liga Profesional Argentina', teamA:'River Plate', teamB:'Independiente', dateLabel:'Agosto 2026', confidence:'Alta',
+    reasoning:'River amplamente favorito em casa no Monumental diante de um Independiente irregular.',
+    markets:[
+      m('Resultado Final', ['River Plate','Empate','Independiente'], [58,25,17], [[1.68,1.65,1.72,1.66,1.70],[3.60,3.50,3.70,3.55,3.65],[5.00,4.80,5.20,4.90,5.10]]),
+      m('+2.5 Golos', ['Mais de 2.5','Menos de 2.5'], [54,46], [[1.85,1.80,1.90,1.83,1.95],[1.95,2.00,1.90,1.98,1.86]]),
+      m('Ambas Marcam', ['Sim','Não'], [48,52], [[1.92,1.88,1.95,1.90,2.00],[1.88,1.92,1.85,1.90,1.80]])
+    ]},
+  {id:'bb1', sport:'Basquetebol', competition:'LPB', teamA:'FC Porto', teamB:'Benfica', dateLabel:'03 Ago · 20:00', confidence:'Alta',
+    reasoning:'O FC Porto tem a melhor defesa da liga e joga em casa, onde não perde há 12 jogos. Vitória confortável esperada.',
+    markets:[
+      m('Vencedor', ['FC Porto','Benfica'], [70,30], [[1.30,1.28,1.32,1.29,1.31],[3.40,3.55,3.30,3.45,3.38]]),
+      m('Total de Pontos (165.5)', ['Mais de 165.5','Menos de 165.5'], [55,45], [[1.90,1.95,1.88,1.92,1.85],[1.90,1.85,1.95,1.88,1.98]])
+    ]},
+  {id:'bb2', sport:'Basquetebol', competition:'LPB', teamA:'Sporting', teamB:'Ovarense', dateLabel:'05 Ago · 19:00', confidence:'Média',
+    reasoning:'O Ovarense venceu 3 dos últimos 4 confrontos diretos e chega com o plantel completo; o mercado ainda trata o Sporting como super favorito.',
+    markets:[
+      m('Vencedor', ['Sporting','Ovarense'], [60,40], [[1.20,1.18,1.22,1.19,1.21],[4.20,4.50,4.00,4.30,4.10]]),
+      m('Total de Pontos (158.5)', ['Mais de 158.5','Menos de 158.5'], [50,50], [[1.92,1.88,1.95,1.90,1.85],[1.88,1.92,1.85,1.90,1.95]])
+    ]},
+  {id:'bb3', sport:'Basquetebol', competition:'LPB', teamA:'Illiabum', teamB:'Lusitânia', dateLabel:'05 Ago · 17:00', confidence:'Baixa',
+    reasoning:'Confronto muito equilibrado sem vantagem estatística clara para nenhuma das equipas nesta época.',
+    markets:[
+      m('Vencedor', ['Illiabum','Lusitânia'], [52,48], [[1.90,1.95,1.88,1.92,1.85],[1.95,1.90,2.00,1.93,1.98]]),
+      m('Total de Pontos (150.5)', ['Mais de 150.5','Menos de 150.5'], [54,46], [[1.90,1.85,1.95,1.88,1.92],[1.90,1.95,1.85,1.92,1.88]])
+    ]},
+  {id:'tn1', sport:'Ténis', competition:'ATP 250', teamA:'N. Silva', teamB:'J. Costa', dateLabel:'03 Ago · 14:00', confidence:'Média',
+    reasoning:'N. Silva vence 6 dos últimos 10 encontros em piso rápido, mas J. Costa tem vindo a melhorar o serviço nos últimos torneios.',
+    markets:[
+      m('Vencedor do Encontro', ['N. Silva','J. Costa'], [55,45], [[1.75,1.80,1.78,1.72,1.77],[2.05,2.00,2.10,2.15,2.08]]),
+      m('Total de Jogos (22.5)', ['Mais de 22.5','Menos de 22.5'], [50,50], [[1.90,1.85,1.95,1.88,1.92],[1.90,1.95,1.85,1.92,1.88]])
+    ]},
+  {id:'tn2', sport:'Ténis', competition:'WTA 500', teamA:'R. Mendes', teamB:'T. Alves', dateLabel:'03 Ago · 16:30', confidence:'Alta',
+    reasoning:'R. Mendes não perde há 14 jogos neste piso e lidera o confronto direto por 5-1, mas as odds já não pagam bem essa favorita; o mercado paga melhor uma vitória surpresa de T. Alves.',
+    markets:[
+      m('Vencedor do Encontro', ['R. Mendes','T. Alves'], [65,35], [[1.40,1.38,1.42,1.35,1.39],[3.00,3.10,2.95,3.20,3.05]]),
+      m('Total de Jogos (20.5)', ['Mais de 20.5','Menos de 20.5'], [50,50], [[1.88,1.92,1.85,1.90,1.95],[1.92,1.88,1.95,1.90,1.85]])
+    ]},
+  {id:'tn3', sport:'Ténis', competition:'ATP 250', teamA:'D. Ramos', teamB:'P. Nunes', dateLabel:'04 Ago · 12:00', confidence:'Baixa',
+    reasoning:'Sem dados suficientes de confrontos diretos recentes, mas P. Nunes tem vindo a subir no ranking e o mercado ainda não ajustou totalmente a cotação.',
+    markets:[
+      m('Vencedor do Encontro', ['D. Ramos','P. Nunes'], [50,50], [[1.60,1.65,1.62,1.58,1.63],[2.30,2.25,2.35,2.40,2.28]]),
+      m('Total de Jogos (21.5)', ['Mais de 21.5','Menos de 21.5'], [50,50], [[1.90,1.95,1.85,1.92,1.88],[1.90,1.85,1.95,1.88,1.92]])
+    ]}
+];
+
+function fmt(n){ return n.toFixed(2); }
+function bestOddInfo(oddsArr){ const v = Math.max(...oddsArr); return { val: v, book: BOOKMAKERS[oddsArr.indexOf(v)] }; }
+
+// scans every market/outcome and returns the single best-edge bet for an event
+function computeBestBet(ev){
+  let best = null;
+  ev.markets.forEach((mkt, mi) => {
+    mkt.labels.forEach((label, li) => {
+      const { val, book } = bestOddInfo(mkt.odds[li]);
+      const implied = 100 / val;
+      const edge = mkt.predProbs[li] - implied;
+      if (!best || edge > best.edge) {
+        best = { marketIdx: mi, marketName: mkt.name, outcomeIdx: li, outcome: label, oddVal: val, book, edge };
+      }
+    });
+  });
+  return best;
+}
+
+function computeSafeBet(ev){
+  let best = null;
+  ev.markets.forEach(mkt => {
+    mkt.labels.forEach((label, li) => {
+      const prob = mkt.predProbs[li];
+      if (!best || prob > best.prob) {
+        const { val, book } = bestOddInfo(mkt.odds[li]);
+        best = { marketName: mkt.name, outcome: label, prob, oddVal: val, book };
+      }
+    });
+  });
+  return best && best.prob >= 60 ? best : null;
+}
+
+class Component extends DCLogic {
+  state = {
+    screen: 'home',
+    history: [],
+    selectedSport: 'Futebol',
+    selectedEventId: 'fb1',
+    activeMarketIndex: 0,
+    favorites: [],
+    searchQuery: '',
+    preferredBooks: [...BOOKMAKERS],
+    comboPool: 'mista',
+    comboCount: 3,
+    comboLegs: [],
+    comboTotalOdd: null
+  };
+
+  navigate(screen, patch) {
+    this.setState(s => ({ ...s, ...(patch||{}), screen, history: [...s.history, s.screen] }));
+  }
+  goBack = () => {
+    this.setState(s => {
+      const h = [...s.history];
+      const prev = h.pop();
+      return { ...s, screen: prev || 'home', history: h };
+    });
+  };
+  setTab(screen) { this.setState({ screen, history: [] }); }
+
+  selectSport(name) { this.navigate('eventos', { selectedSport: name }); }
+  openEvent(id) { this.navigate('detalhe', { selectedEventId: id, activeMarketIndex: 0 }); }
+  setMarket(idx) { this.setState({ activeMarketIndex: idx }); }
+  toggleFav() {
+    this.setState(s => {
+      const has = s.favorites.includes(s.selectedEventId);
+      return { favorites: has ? s.favorites.filter(x=>x!==s.selectedEventId) : [...s.favorites, s.selectedEventId] };
+    });
+  }
+  toggleBook(name) {
+    this.setState(s => {
+      const has = s.preferredBooks.includes(name);
+      return { preferredBooks: has ? s.preferredBooks.filter(x=>x!==name) : [...s.preferredBooks, name] };
+    });
+  }
+  onSearch(e) { this.setState({ searchQuery: e.target.value }); }
+  setComboPool(pool) { this.setState({ comboPool: pool, comboLegs: [], comboTotalOdd: null }); }
+  incComboCount() { this.setState(s => ({ comboCount: Math.min(20, s.comboCount + 1) })); }
+  decComboCount() { this.setState(s => ({ comboCount: Math.max(2, s.comboCount - 1) })); }
+
+  generateCombo() {
+    const pool = this.state.comboPool;
+    const n = this.state.comboCount;
+    const safe = EVENTS.map(ev => ({ ev, bet: computeSafeBet(ev) })).filter(x => x.bet).sort((a,b) => b.bet.prob - a.bet.prob);
+    const value = EVENTS.map(ev => ({ ev, bet: computeBestBet(ev) })).filter(x => x.bet.edge >= 5).sort((a,b) => b.bet.edge - a.bet.edge);
+    const legFromSafe = x => ({ event: x.ev.teamA + ' vs ' + x.ev.teamB, market: x.bet.marketName, outcome: x.bet.outcome, odd: fmt(x.bet.oddVal), tag: 'Segura' });
+    const legFromValue = x => ({ event: x.ev.teamA + ' vs ' + x.ev.teamB, market: x.bet.marketName, outcome: x.bet.outcome, odd: fmt(x.bet.oddVal), tag: 'Valor' });
+    const usedIds = new Set();
+    const chosen = [];
+
+    if (pool === 'segura') {
+      for (const x of safe) { if (usedIds.has(x.ev.id)) continue; usedIds.add(x.ev.id); chosen.push(legFromSafe(x)); if (chosen.length >= n) break; }
+    } else if (pool === 'valor') {
+      for (const x of value) { if (usedIds.has(x.ev.id)) continue; usedIds.add(x.ev.id); chosen.push(legFromValue(x)); if (chosen.length >= n) break; }
+    } else if (pool === 'mista') {
+      let i = 0, j = 0;
+      while (chosen.length < n && (i < safe.length || j < value.length)) {
+        if (i < safe.length) {
+          if (!usedIds.has(safe[i].ev.id)) { usedIds.add(safe[i].ev.id); chosen.push(legFromSafe(safe[i])); }
+          i++;
+          if (chosen.length >= n) break;
+        }
+        if (j < value.length) {
+          if (!usedIds.has(value[j].ev.id)) { usedIds.add(value[j].ev.id); chosen.push(legFromValue(value[j])); }
+          j++;
+          if (chosen.length >= n) break;
+        }
+        if (i >= safe.length && j >= value.length) break;
+      }
+    } else {
+      const scored = [];
+      safe.forEach(x => scored.push({ x, score: x.bet.prob, type: 'safe' }));
+      value.forEach(x => scored.push({ x, score: 50 + x.bet.edge, type: 'value' }));
+      scored.sort((a,b) => b.score - a.score);
+      for (const s of scored) {
+        if (usedIds.has(s.x.ev.id)) continue;
+        usedIds.add(s.x.ev.id);
+        chosen.push(s.type === 'safe' ? legFromSafe(s.x) : legFromValue(s.x));
+        if (chosen.length >= n) break;
+      }
+    }
+    const totalOdd = chosen.reduce((acc, l) => acc * parseFloat(l.odd), 1);
+    this.setState({ comboLegs: chosen, comboTotalOdd: chosen.length ? totalOdd.toFixed(2) : null });
+  }
+
+  buildEventSummary(ev) {
+    const main = ev.markets[0];
+    const mainBestPerOutcome = main.odds.map(o => Math.max(...o));
+    const topOutcomeIdx = mainBestPerOutcome.indexOf(Math.max(...mainBestPerOutcome));
+    const { val, book } = bestOddInfo(main.odds[topOutcomeIdx]);
+    const bet = computeBestBet(ev);
+    return {
+      id: ev.id, sport: ev.sport, competition: ev.competition,
+      matchup: ev.teamA + ' vs ' + ev.teamB, dateLabel: ev.dateLabel,
+      bestOdd: fmt(val), bestBook: book,
+      predLine: main.labels[main.predProbs.indexOf(Math.max(...main.predProbs))] + ' ' + Math.max(...main.predProbs) + '%',
+      recMarket: bet.marketName, recOutcome: bet.outcome,
+      valueEdge: Math.max(0, Math.round(bet.edge)),
+      onOpen: () => this.openEvent(ev.id)
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const sportsNames = ['Futebol','Basquetebol','Ténis'];
+    const sportsList = sportsNames.map(name => ({
+      name, count: EVENTS.filter(e=>e.sport===name).length,
+      onSelect: () => this.selectSport(name)
+    }));
+
+    const withBets = EVENTS.map(ev => ({ ev, bet: computeBestBet(ev) }));
+    const valueEvents = withBets.filter(x => x.bet.edge >= 5).sort((a,b)=>b.bet.edge-a.bet.edge).slice(0,2);
+    const destaqueEvents = valueEvents.map(x => this.buildEventSummary(x.ev));
+
+    const shownIds = new Set(destaqueEvents.map(e=>e.id));
+    const upcomingEvents = EVENTS.filter(e=>!shownIds.has(e.id)).slice(0,4).map(ev=>this.buildEventSummary(ev));
+
+    const confScore = { 'Alta': 3, 'Média': 2, 'Baixa': 1 };
+    const rankedPredictions = [...withBets].sort((a,b) => {
+      const sa = confScore[a.ev.confidence]*10 + a.bet.edge;
+      const sb = confScore[b.ev.confidence]*10 + b.bet.edge;
+      return sb - sa;
+    }).slice(0,5).map(x => {
+      const summary = this.buildEventSummary(x.ev);
+      return { ...summary, confidence: x.ev.confidence, hasValue: x.bet.edge >= 5 };
+    });
+
+    const q = s.searchQuery.trim().toLowerCase();
+    const hasSearchQuery = q.length > 0;
+    const searchResults = hasSearchQuery ? EVENTS.filter(e => (e.teamA+' '+e.teamB).toLowerCase().includes(q)).map(ev=>this.buildEventSummary(ev)) : [];
+
+    const eventosListView = EVENTS.filter(e=>e.sport===s.selectedSport).map(ev=>this.buildEventSummary(ev));
+
+    const currentEvent = EVENTS.find(e=>e.id===s.selectedEventId) || EVENTS[0];
+    const currentBet = computeBestBet(currentEvent);
+    const activeMarket = currentEvent.markets[s.activeMarketIndex] || currentEvent.markets[0];
+    const activeBestPerOutcome = activeMarket.odds.map(o => Math.max(...o));
+    const activeTopIdx = activeBestPerOutcome.indexOf(Math.max(...activeBestPerOutcome));
+    const heroBest = bestOddInfo(activeMarket.odds[activeTopIdx]);
+
+    const mainMarket = currentEvent.markets[0];
+    const predBars = mainMarket.labels.map((label,i)=>({ label, pct: mainMarket.predProbs[i] }));
+    const hasValueBet = currentBet.edge >= 5;
+
+    const marketTabs = currentEvent.markets.map((mkt, mi) => ({
+      name: mkt.name, onSelect: () => this.setMarket(mi),
+      bg: s.activeMarketIndex===mi ? '#5980a6' : 'transparent',
+      color: s.activeMarketIndex===mi ? '#f2f2f3' : '#1d1f20'
+    }));
+    const visibleBookIdx = BOOKMAKERS.map((b,i)=>({b,i})).filter(x=>s.preferredBooks.includes(x.b));
+    const hasVisibleBooks = visibleBookIdx.length > 0;
+    const visibleBookHeaders = visibleBookIdx.map(x=>x.b);
+    const activeMarketRows = activeMarket.labels.map((label,li) => {
+      const rowOdds = activeMarket.odds[li];
+      const visibleVals = visibleBookIdx.map(x=>rowOdds[x.i]);
+      const maxVal = visibleVals.length ? Math.max(...visibleVals) : null;
+      const cells = visibleBookIdx.map(x => {
+        const v = rowOdds[x.i];
+        const isBest = v === maxVal;
+        return { odd: fmt(v), bg: isBest ? '#eef6ff' : 'transparent', color: isBest ? '#2c455d' : '#1d1f20', weight: isBest ? '700' : '400' };
+      });
+      return { label, cells };
+    });
+
+    const safeBetsView = EVENTS.map(ev => ({ ev, bet: computeSafeBet(ev) })).filter(x => x.bet).sort((a,b) => b.bet.prob - a.bet.prob).map(x => ({
+      matchup: x.ev.teamA + ' vs ' + x.ev.teamB, market: x.bet.marketName, outcome: x.bet.outcome,
+      prob: x.bet.prob, odd: fmt(x.bet.oddVal), onOpen: () => this.openEvent(x.ev.id)
+    }));
+    const valueBetsView = withBets.filter(x => x.bet.edge >= 5).sort((a,b) => b.bet.edge - a.bet.edge).map(x => ({
+      matchup: x.ev.teamA + ' vs ' + x.ev.teamB, market: x.bet.marketName, outcome: x.bet.outcome,
+      edge: Math.round(x.bet.edge), odd: fmt(x.bet.oddVal), onOpen: () => this.openEvent(x.ev.id)
+    }));
+    const comboPoolOptions = [
+      { key: 'segura', label: 'Seguras' }, { key: 'valor', label: 'Valor' },
+      { key: 'mista', label: 'Misturado' }, { key: 'ia', label: 'IA escolhe' }
+    ].map(o => ({ ...o, onSelect: () => this.setComboPool(o.key),
+      bg: s.comboPool===o.key ? '#5980a6' : 'transparent', color: s.comboPool===o.key ? '#f2f2f3' : '#1d1f20',
+      borderColor: s.comboPool===o.key ? '#5980a6' : 'rgba(29,31,32,0.16)' }));
+
+    const favoritesView = s.favorites.map(id => EVENTS.find(e=>e.id===id)).filter(Boolean).map(ev=>this.buildEventSummary(ev));
+
+    const bookToggles = BOOKMAKERS.map(name => {
+      const on = s.preferredBooks.includes(name);
+      return { name, onToggle: () => this.toggleBook(name), bg: on ? '#eef6ff' : 'transparent', color: on ? '#2c455d' : 'rgba(29,31,32,0.5)', borderColor: on ? '#5980a6' : 'rgba(29,31,32,0.16)' };
+    });
+
+    const tabColors = (name) => s.screen===name ? '#416180' : 'rgba(29,31,32,0.45)';
+    const tabBorders = (name) => s.screen===name ? '#5980a6' : 'transparent';
+
+    return {
+      isHome: s.screen==='home', isExplorar: s.screen==='explorar', isEventos: s.screen==='eventos',
+      isDetalhe: s.screen==='detalhe', isFavoritos: s.screen==='favoritos', isPerfil: s.screen==='perfil',
+      isCombos: s.screen==='combos',
+      safeBetsView, valueBetsView, comboPoolOptions,
+      comboCount: s.comboCount, incComboCount: () => this.incComboCount(), decComboCount: () => this.decComboCount(),
+      generateCombo: () => this.generateCombo(), comboLegs: s.comboLegs, comboTotalOdd: s.comboTotalOdd,
+      hasComboLegs: s.comboLegs.length > 0, hasNoComboLegs: s.comboLegs.length === 0,
+      sportsList, destaqueEvents, upcomingEvents,
+      rankedPredictions,
+      searchQuery: s.searchQuery, onSearchChange: (e)=>this.onSearch(e),
+      hasSearchQuery, hasNoSearchQuery: !hasSearchQuery, searchResults, searchResultsCount: searchResults.length,
+      selectedSport: s.selectedSport, eventosListView, eventosListCount: eventosListView.length,
+      goBack: this.goBack,
+      eventSport: currentEvent.sport, eventCompetition: currentEvent.competition,
+      eventMatchup: currentEvent.teamA + ' vs ' + currentEvent.teamB, eventDateLabel: currentEvent.dateLabel,
+      favoriteLabel: s.favorites.includes(currentEvent.id) ? '★ Favorito' : '☆ Favoritar',
+      toggleFavorite: () => this.toggleFav(),
+      predBars, predConfidence: currentEvent.confidence,
+      heroBestOdd: fmt(heroBest.val), heroBestBook: heroBest.book, activeMarketName: activeMarket.name,
+      hasValueBet, valueEdge: Math.max(0, Math.round(currentBet.edge)),
+      recMarket: currentBet.marketName, recOutcome: currentBet.outcome,
+      recOdd: fmt(currentBet.oddVal), recBook: currentBet.book, eventReasoning: currentEvent.reasoning,
+      marketTabs, hasVisibleBooks, hasNoVisibleBooks: !hasVisibleBooks, visibleBookHeaders, activeMarketRows,
+      hasFavorites: favoritesView.length>0, hasNoFavorites: favoritesView.length===0, favoritesView,
+      bookToggles,
+      goToHome: () => this.setTab('home'), goToExplorar: () => this.setTab('explorar'),
+      goToFavoritos: () => this.setTab('favoritos'), goToPerfil: () => this.setTab('perfil'),
+      goToCombos: () => this.setTab('combos'),
+      tabCombosColor: tabColors('combos'), tabCombosBorder: tabBorders('combos'),
+      tabHomeColor: tabColors('home'), tabHomeBorder: tabBorders('home'),
+      tabExplorarColor: tabColors('explorar'), tabExplorarBorder: tabBorders('explorar'),
+      tabFavoritosColor: tabColors('favoritos'), tabFavoritosBorder: tabBorders('favoritos'),
+      tabPerfilColor: tabColors('perfil'), tabPerfilBorder: tabBorders('perfil')
+    };
+  }
+}
+</script>
+</body>
+</html>
