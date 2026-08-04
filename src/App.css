@@ -1,0 +1,12 @@
+.phone-frame {
+  width: 412px;
+  height: 860px;
+  max-width: 100vw;
+  max-height: 100vh;
+  border-radius: 22px;
+  background: var(--bg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+}
