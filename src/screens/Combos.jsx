@@ -14,14 +14,14 @@ const POOL_OPTIONS = [
 export default function Combos({ onOpenEvent }) {
   const [comboPool, setComboPool] = useState('mista');
   const [comboCount, setComboCount] = useState(3);
-  const [combo, setCombo] = useState({ legs: [], totalOdd: null });
+  const [combo, setCombo] = useState({ legs: [], totalOdd: null, totalProb: null });
 
   const safeBets = getSafeBets(events);
   const valueBets = getValueBets(events);
 
   function selectPool(pool) {
     setComboPool(pool);
-    setCombo({ legs: [], totalOdd: null });
+    setCombo({ legs: [], totalOdd: null, totalProb: null });
   }
 
   function handleGenerate() {
@@ -152,7 +152,9 @@ export default function Combos({ onOpenEvent }) {
                 <div key={`${leg.event}-${index}`} className="combo-leg">
                   <div className="combo-leg__top">
                     <span className="combo-leg__event">{leg.event}</span>
-                    <span className="combo-leg__tag">{leg.tag}</span>
+                    <span className="combo-leg__tag">
+                      {leg.tag} · {Math.round(leg.predProb * 100)}%
+                    </span>
                   </div>
                   <div className="combo-leg__bottom">
                     <span className="combo-leg__pick heading">
@@ -166,6 +168,15 @@ export default function Combos({ onOpenEvent }) {
             <div className="combo-total">
               <span className="combo-total__label">Odd total do combinado</span>
               <span className="combo-total__value heading">{combo.totalOdd}</span>
+            </div>
+            <div className="combo-total combo-total--prob">
+              <span className="combo-total__label">
+                Probabilidade combinada
+                <span className="combo-total__hint"> (segundo o mercado/IA, pernas independentes)</span>
+              </span>
+              <span className="combo-total__value combo-total__value--prob heading">
+                {Math.round(combo.totalProb * 100)}%
+              </span>
             </div>
           </>
         ) : (
