@@ -1,4 +1,5 @@
 import CornerCard from '../components/CornerCard.jsx';
+import Logo from '../components/Logo.jsx';
 import { SPORTS, events } from '../data/events.js';
 import { getValueHighlights, getUpcoming, formatDate } from '../lib/predictions.js';
 import './Home.css';
@@ -10,7 +11,10 @@ export default function Home({ onSelectSport, onOpenEvent }) {
   return (
     <div className="home">
       <header className="home__header">
-        <span className="home__wordmark heading">OddScout</span>
+        <div className="home__brand">
+          <Logo />
+          <span className="home__wordmark heading">OddScout</span>
+        </div>
         <button type="button" className="home__avatar" aria-label="Perfil">
           JP
         </button>
