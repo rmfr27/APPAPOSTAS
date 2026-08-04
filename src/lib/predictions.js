@@ -129,6 +129,7 @@ export function generateCombo(events, pool, count) {
     market: bet.market,
     outcome: bet.outcome,
     odd: bet.odd,
+    predProb: bet.predProb,
     tag: 'Segura',
   });
   const legFromValue = ({ event, bet }) => ({
@@ -136,6 +137,7 @@ export function generateCombo(events, pool, count) {
     market: bet.market,
     outcome: bet.outcome,
     odd: bet.odd,
+    predProb: bet.predProb,
     tag: 'Valor',
   });
 
@@ -192,7 +194,15 @@ export function generateCombo(events, pool, count) {
   }
 
   const totalOdd = chosen.reduce((acc, leg) => acc * leg.odd, 1);
-  return { legs: chosen, totalOdd: chosen.length ? totalOdd.toFixed(2) : null };
+  // Combined probability assumes independence across legs (fair for
+  // different matches, same devig/mock predProb each leg already carries —
+  // see README "Data — Important" for what that number actually represents).
+  const totalProb = chosen.reduce((acc, leg) => acc * leg.predProb, 1);
+  return {
+    legs: chosen,
+    totalOdd: chosen.length ? totalOdd.toFixed(2) : null,
+    totalProb: chosen.length ? totalProb : null,
+  };
 }
 
 export function confidenceLabel(predProb) {
