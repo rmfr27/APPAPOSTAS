@@ -12,26 +12,33 @@ Stack escolhida: **React web (Vite)**, não React Native.
 
 Fluxo de trabalho usado até agora: uma branch por funcionalidade, PR pequeno e revisável, merge antes de começar a próxima branch. Segue esse padrão.
 
-PRs já mesclados:
-- **#1** — `.gitignore` (o "primeiro PR" de prática)
+PRs já mesclados (todos por squash):
+- **#1** — `.gitignore`
 - **#2** — scaffold do projeto React + ecrã Início (Home)
-- **#3** — ecrãs Eventos + Detalhe, navegação com stack (mesclado por squash em 2026-08-04)
+- **#3** — ecrãs Eventos + Detalhe, navegação com stack
+- **#4** — integração com odds reais (The Odds API)
+- **#5** — ecrã Explorar
+- **#6** — ecrã Combos
+- **#7** — ecrã Favoritos
+- **#8** — ecrã Perfil
 
-Branch atual: `feat/odds-reais` — integração com odds reais (ver secção abaixo), ainda não é PR.
+Todos os 7 ecrãs do handoff estão feitos. #4–#8 foram todos criados a partir do mesmo commit de `main` (em paralelo, não empilhados), por isso o merge de cada um a seguir ao anterior exigiu rebase + resolver conflitos em `App.jsx` (e `predictions.js` entre #5/#6) — nada de grave, só imports/`switch` a combinar, exceto um ponto real descrito abaixo.
+
+**Decisão tomada ao mesclar #8 (Perfil) por cima de #4 (odds reais)**: o #8 tinha `preferredBooks` a arrancar como `useState(BOOKMAKERS)` (as 5 casas PT). Isso participava mal com o #4, que já tinha decidido mostrar bookmakers internacionais reais — se o default fosse a lista fixa PT, a tabela de odds de **todo** evento real ficava vazia por defeito (interseção de PT-5 com bookmakers reais = sempre nada), escondendo a funcionalidade toda sem o utilizador tocar em nada. Resolvido para `useState(null)` (`null` = sem restrição, mostra tudo — já era o contrato que `Detalhe.jsx` esperava desde o #4). `Perfil.jsx` trata `null` como "as 5 casas PT aparecem todas ligadas"; o primeiro toggle que o utilizador fizer converte isso numa lista real (`toggleBook` em `App.jsx` expande a partir de `BOOKMAKERS` nesse momento). Testado no browser com dados reais e mock depois da resolução — funciona nos dois casos.
 
 ## Estado do código
 - `src/App.jsx` — shell de navegação: `nav` (screen + params) + `history` stack. `navigate(screen, params)` empurra, `goBack()` remove, `setTab(tabId)` reseta o stack. Tab bar sempre visível no fundo.
 - `src/screens/Home.jsx` — **feito**. Chips de desporto, "Destaques de valor" (apostas de valor, edge ≥5pp), "Próximos eventos".
 - `src/screens/Eventos.jsx` — **feito**. Lista de eventos por desporto.
-- `src/screens/Detalhe.jsx` — **feito**. Previsão IA, aposta recomendada, separadores de mercado, tabela de odds comparativa, favoritar.
-- `src/screens/Placeholder.jsx` — usado pelos separadores ainda não implementados (Explorar, Combos, Favoritos, Perfil).
-- `src/lib/predictions.js` — toda a lógica de cálculo: `edge`, `bestOdd`, `bestOddMainMarket` (odd "simples" do mercado principal, usada nas listas) vs `bestEdgeForEvent` (a melhor aposta de valor entre TODOS os mercados, usada nos cards de destaque e no card "Aposta recomendada"). Estas duas são propositadamente diferentes — não as confundir.
-- `src/data/events.js` — dados mock. Cada evento tem 2 mercados (ex: "Resultado Final" + "Ambas Marcam") para os separadores de mercado terem sentido. Dados **ilustrativos**, não reais.
+- `src/screens/Detalhe.jsx` — **feito**. Previsão IA, aposta recomendada, separadores de mercado, tabela de odds comparativa (colunas derivadas dinamicamente das casas que o mercado ativo realmente tem — ver secção de odds reais), favoritar.
+- `src/screens/Explorar.jsx`, `Combos.jsx`, `Favoritos.jsx`, `Perfil.jsx` — **feitos**. `src/screens/Placeholder.jsx` já não é usado por nenhum separador (pode ser removido num cleanup futuro, mas não estorva).
+- `src/lib/predictions.js` — toda a lógica de cálculo: `edge`, `bestOdd`, `bestOddMainMarket` (odd "simples" do mercado principal, usada nas listas) vs `bestEdgeForEvent` (a melhor aposta de valor entre TODOS os mercados, usada nos cards de destaque e no card "Aposta recomendada"). Estas duas são propositadamente diferentes — não as confundir. Também: `searchEvents`, `getRankedPredictions` (Explorar), `bestSafeBet`/`getSafeBets`/`getValueBets`/`generateCombo` (Combos).
+- `src/data/events.js` — `events` carrega `src/data/live_events.json` (gerado por `npm run fetch:odds`, gitignored) quando existe e não está vazio; cai para os dados mock caso contrário. Os dados mock continuam com 2 mercados por evento, **ilustrativos**, não reais.
 - `src/components/CornerCard.jsx` — o card com as marcas de canto ("+") do motivo "blueprint" do design. Aceita `onClick` (torna-se clicável/focável automaticamente).
 - `src/components/TabBar.jsx`, `BackButton.jsx` — reutilizáveis.
 - Tokens de design (cores, fontes) estão em `src/index.css` como CSS custom properties — usa-os em vez de hardcodar cores novas.
 
-## Integração com odds reais (feito, branch `feat/odds-reais`, ainda não é PR)
+## Integração com odds reais (feito, mesclado no #4)
 - `src/services/oddsApi.js` — chama [The Odds API](https://the-odds-api.com) e normaliza a resposta para o formato do projeto (`{id, sport, competition, teamA, teamB, date, markets: [{name, outcomes: [{label, predProb, odds}]}]}`). Traduz nomes de mercado (`h2h`→"Resultado Final", `totals`→"Total de Pontos", `spreads`→"Handicap"; qualquer outra chave, ex. `h2h_lay` da Betfair Exchange, é ignorada) e de outcome (equipa da casa/fora→"Casa"/"Fora", `Draw`→"Empate", `Over`/`Under`→"Mais"/"Menos X.X").
 - `predProb` é calculado por **devig do consenso do mercado** (média das probabilidades implícitas de todos os bookmakers do outcome, normalizada a somar 100% por mercado) — decisão tomada com o Ruben em 2026-08-04.
 - `scripts/fetchOdds.js` — corre com `npm run fetch:odds`, lê `ODDS_API_KEY` de `.env` (via `process.loadEnvFile`, nativo do Node — sem dependência `dotenv`), busca `soccer_epl`, `soccer_spain_la_liga`, `basketball_nba` e resolve os torneios de ténis ativos dinamicamente via `fetchActiveTennisKeys()` (a API não tem uma chave fixa "circuito ATP" — cada torneio tem a sua própria chave, ex. `tennis_atp_canadian_open`, que muda semana a semana). Escreve `src/data/live_events.json` (gitignored, gerado localmente).
@@ -49,11 +56,12 @@ Explorado fora do repo (`scratchpad`, não commitado) para responder à pergunta
 - **Nomes de equipas não batem** entre football-data.co.uk (abreviado, ex. "Sp Lisbon") e a The Odds API / dados mock (ex. "Sporting CP") — vai ser preciso um mapa de nomes antes de juntar as duas fontes.
 - **Não retomado ainda**: os scripts do protótipo (`poisson.js`, `poisson2.js`) ficaram só no scratchpad da sessão, não foram trazidos para o repo. Se for para continuar isto a sério, decidir onde vive (pasta `ml/`? serviço à parte?) antes de escrever mais código.
 
-## O que falta (por ordem sugerida no README do handoff)
-1. **Explorar** — pesquisa por nome de equipa/jogador + lista "Melhores previsões da IA" + seletor de desporto.
-2. **Combos** — zonas Seguras/Valor + gerador de combinado (4 pools, stepper de pernas 2–20).
-3. **Favoritos** — lista dos eventos favoritados (o estado `favorites` já existe em `App.jsx`, só falta o ecrã).
-4. **Perfil** — toggles de casas de apostas preferidas (o `Detalhe.jsx` já respeita `preferredBooks`, mas hoje é uma constante fixa com as 5 casas — precisa de passar a estado real quando este ecrã existir).
+## O que falta
+Todos os 7 ecrãs do handoff (Início, Explorar, Eventos, Detalhe, Combos, Favoritos, Perfil) estão feitos e ligados a dados reais. Ideias em aberto, nenhuma urgente:
+- **Combos/Explorar/Favoritos ainda não foram testados com dados reais em profundidade** (só Home/Eventos/Detalhe tiveram esse teste explícito durante o merge de 2026-08-04) — vale confirmar visualmente antes de considerar isto 100% robusto com odds reais.
+- **`src/screens/Placeholder.jsx`** ficou sem uso — remover num cleanup, se ninguém se lembrar antes.
+- **Modelo de previsão real (ML)** — ver secção "Exploração de Machine Learning" acima; não retomado, fica para quando fizer sentido.
+- **`tag--value` / heurística "IA"**: com dados reais, o "valor" que aparece vem de comparar o consenso do mercado com a melhor odd entre várias casas (price shopping legítimo), não de uma previsão própria — está correto assim, só a documentar para não se confundir com uma promessa de "a IA sabe mais que o mercado".
 
 ## Como correr localmente
 ```bash
