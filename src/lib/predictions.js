@@ -63,6 +63,28 @@ export function getUpcoming(events) {
     .map((event) => ({ event, best: bestOddMainMarket(event) }));
 }
 
+export function searchEvents(events, query) {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  return events.filter((event) => `${event.teamA} ${event.teamB}`.toLowerCase().includes(q));
+}
+
+// "Confidence-weighted score" per the README: rank by how sure the AI is of
+// its main-market favourite, boosted when the recommended bet also has
+// positive edge (a confident AND valuable pick ranks above a merely
+// confident one).
+export function getRankedPredictions(events, count = 5) {
+  return events
+    .map((event) => {
+      const favorite = favoriteOutcome(mainMarket(event));
+      const recommended = bestEdgeForEvent(event);
+      const score = favorite.predProb + Math.max(recommended.edge, 0) / 100;
+      return { event, favorite, recommended, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, count);
+}
+
 export function confidenceLabel(predProb) {
   if (predProb >= 0.6) return 'Alta';
   if (predProb >= 0.45) return 'Média';

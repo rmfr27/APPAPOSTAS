@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import TabBar, { TABS } from './components/TabBar.jsx';
 import Home from './screens/Home.jsx';
+import Explorar from './screens/Explorar.jsx';
 import Eventos from './screens/Eventos.jsx';
 import Detalhe from './screens/Detalhe.jsx';
 import Placeholder from './screens/Placeholder.jsx';
@@ -49,6 +50,13 @@ function App() {
       case 'inicio':
         return (
           <Home
+            onSelectSport={(sport) => navigate('eventos', { sport })}
+            onOpenEvent={(eventId) => navigate('detalhe', { eventId })}
+          />
+        );
+      case 'explorar':
+        return (
+          <Explorar
             onSelectSport={(sport) => navigate('eventos', { sport })}
             onOpenEvent={(eventId) => navigate('detalhe', { eventId })}
           />
