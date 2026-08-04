@@ -28,6 +28,16 @@ export default function Combos({ onOpenEvent }) {
     setCombo(generateCombo(events, comboPool, comboCount));
   }
 
+  function removeLeg(index) {
+    setCombo((prev) => {
+      const legs = prev.legs.filter((_, i) => i !== index);
+      if (legs.length === 0) return { legs: [], totalOdd: null, totalProb: null };
+      const totalOdd = legs.reduce((acc, leg) => acc * leg.odd, 1);
+      const totalProb = legs.reduce((acc, leg) => acc * leg.predProb, 1);
+      return { legs, totalOdd: totalOdd.toFixed(2), totalProb };
+    });
+  }
+
   return (
     <div className="combos">
       <h1 className="combos__title heading">Seguras &amp; Valor</h1>
@@ -152,8 +162,18 @@ export default function Combos({ onOpenEvent }) {
                 <div key={`${leg.event}-${index}`} className="combo-leg">
                   <div className="combo-leg__top">
                     <span className="combo-leg__event">{leg.event}</span>
-                    <span className="combo-leg__tag">
-                      {leg.tag} · {Math.round(leg.predProb * 100)}%
+                    <span className="combo-leg__top-right">
+                      <span className="combo-leg__tag">
+                        {leg.tag} · {Math.round(leg.predProb * 100)}%
+                      </span>
+                      <button
+                        type="button"
+                        className="combo-leg__remove"
+                        onClick={() => removeLeg(index)}
+                        aria-label={`Remover ${leg.event} do combinado`}
+                      >
+                        ×
+                      </button>
                     </span>
                   </div>
                   <div className="combo-leg__bottom">
