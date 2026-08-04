@@ -40,10 +40,33 @@ export function getValueHighlights(events, count = 2) {
     .slice(0, count);
 }
 
+// The main market is always the event's first market (Resultado Final /
+// Vencedor). The "favourite" is its highest predicted-probability outcome.
+export function mainMarket(event) {
+  return event.markets[0];
+}
+
+export function favoriteOutcome(market) {
+  return market.outcomes.reduce((a, b) => (b.predProb > a.predProb ? b : a));
+}
+
+// Plain "melhor odd" shown on list rows (Home upcoming, Eventos) — the best
+// available odd for the main market's favourite, independent of the
+// AI value/edge logic used for highlight cards and the recommended bet.
+export function bestOddMainMarket(event) {
+  return bestOdd(favoriteOutcome(mainMarket(event)));
+}
+
 export function getUpcoming(events) {
   return [...events]
     .sort((a, b) => new Date(a.date) - new Date(b.date))
-    .map((event) => ({ event, best: bestEdgeForEvent(event) }));
+    .map((event) => ({ event, best: bestOddMainMarket(event) }));
+}
+
+export function confidenceLabel(predProb) {
+  if (predProb >= 0.6) return 'Alta';
+  if (predProb >= 0.45) return 'Média';
+  return 'Baixa';
 }
 
 export function formatDate(isoDate) {

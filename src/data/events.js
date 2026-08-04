@@ -24,6 +24,13 @@ export const events = [
           { label: 'Fora', predProb: 0.32, odds: { Bet365: 2.7, Betano: 2.75, Betclic: 2.68, Placard: 2.72, Solverde: 2.7 } },
         ],
       },
+      {
+        name: 'Ambas Marcam',
+        outcomes: [
+          { label: 'Sim', predProb: 0.58, odds: { Bet365: 1.75, Betano: 1.72, Betclic: 1.7, Placard: 1.73, Solverde: 1.74 } },
+          { label: 'Não', predProb: 0.42, odds: { Bet365: 2.05, Betano: 2.1, Betclic: 2.05, Placard: 2.0, Solverde: 2.08 } },
+        ],
+      },
     ],
   },
   {
@@ -40,6 +47,13 @@ export const events = [
           { label: 'Casa', predProb: 0.66, odds: { Bet365: 1.55, Betano: 1.5, Betclic: 1.52, Placard: 1.53, Solverde: 1.5 } },
           { label: 'Empate', predProb: 0.19, odds: { Bet365: 4.1, Betano: 4.0, Betclic: 4.2, Placard: 4.1, Solverde: 4.0 } },
           { label: 'Fora', predProb: 0.15, odds: { Bet365: 6.0, Betano: 5.8, Betclic: 5.9, Placard: 6.1, Solverde: 5.9 } },
+        ],
+      },
+      {
+        name: 'Ambas Marcam',
+        outcomes: [
+          { label: 'Sim', predProb: 0.4, odds: { Bet365: 2.3, Betano: 2.25, Betclic: 2.28, Placard: 2.3, Solverde: 2.32 } },
+          { label: 'Não', predProb: 0.6, odds: { Bet365: 1.58, Betano: 1.55, Betclic: 1.57, Placard: 1.56, Solverde: 1.58 } },
         ],
       },
     ],
@@ -60,6 +74,13 @@ export const events = [
           { label: 'Fora', predProb: 0.3, odds: { Bet365: 3.0, Betano: 2.95, Betclic: 3.05, Placard: 3.0, Solverde: 2.9 } },
         ],
       },
+      {
+        name: 'Ambas Marcam',
+        outcomes: [
+          { label: 'Sim', predProb: 0.61, odds: { Bet365: 1.68, Betano: 1.65, Betclic: 1.67, Placard: 1.66, Solverde: 1.68 } },
+          { label: 'Não', predProb: 0.39, odds: { Bet365: 2.2, Betano: 2.15, Betclic: 2.18, Placard: 2.2, Solverde: 2.22 } },
+        ],
+      },
     ],
   },
   {
@@ -78,6 +99,13 @@ export const events = [
           { label: 'Fora', predProb: 0.23, odds: { Bet365: 3.4, Betano: 3.5, Betclic: 3.45, Placard: 3.4, Solverde: 3.35 } },
         ],
       },
+      {
+        name: 'Ambas Marcam',
+        outcomes: [
+          { label: 'Sim', predProb: 0.5, odds: { Bet365: 1.9, Betano: 1.85, Betclic: 1.88, Placard: 1.9, Solverde: 1.92 } },
+          { label: 'Não', predProb: 0.5, odds: { Bet365: 1.9, Betano: 1.85, Betclic: 1.87, Placard: 1.9, Solverde: 1.88 } },
+        ],
+      },
     ],
   },
   {
@@ -93,6 +121,13 @@ export const events = [
         outcomes: [
           { label: 'Casa', predProb: 0.48, odds: { Bet365: 2.0, Betano: 1.95, Betclic: 1.98, Placard: 2.0, Solverde: 2.02 } },
           { label: 'Fora', predProb: 0.52, odds: { Bet365: 1.9, Betano: 1.88, Betclic: 1.85, Placard: 1.9, Solverde: 1.92 } },
+        ],
+      },
+      {
+        name: 'Total de Pontos',
+        outcomes: [
+          { label: 'Mais 158.5', predProb: 0.54, odds: { Bet365: 1.85, Betano: 1.9, Betclic: 1.88, Placard: 1.85, Solverde: 1.87 } },
+          { label: 'Menos 158.5', predProb: 0.46, odds: { Bet365: 1.95, Betano: 1.9, Betclic: 1.92, Placard: 1.95, Solverde: 1.93 } },
         ],
       },
     ],

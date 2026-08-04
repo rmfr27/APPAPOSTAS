@@ -71,6 +71,10 @@
   gap: 12px;
 }
 
+.highlight-card {
+  cursor: pointer;
+}
+
 .highlight-card__top {
   display: flex;
   justify-content: space-between;
@@ -132,6 +136,7 @@
   row-gap: 2px;
   padding: 12px 0;
   border-bottom: 1px solid var(--border);
+  cursor: pointer;
 }
 
 .upcoming-row__meta {
