@@ -199,6 +199,32 @@
   padding: 2px 6px;
 }
 
+.combo-leg__top-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.combo-leg__remove {
+  width: 18px;
+  height: 18px;
+  line-height: 1;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.combo-leg__remove:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
 .combo-leg__bottom {
   display: flex;
   align-items: center;
