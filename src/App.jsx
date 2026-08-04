@@ -5,6 +5,7 @@ import Explorar from './screens/Explorar.jsx';
 import Eventos from './screens/Eventos.jsx';
 import Detalhe from './screens/Detalhe.jsx';
 import Combos from './screens/Combos.jsx';
+import Favoritos from './screens/Favoritos.jsx';
 import Placeholder from './screens/Placeholder.jsx';
 import './App.css';
 
@@ -82,6 +83,13 @@ function App() {
         );
       case 'combos':
         return <Combos onOpenEvent={(eventId) => navigate('detalhe', { eventId })} />;
+      case 'favoritos':
+        return (
+          <Favoritos
+            favorites={favorites}
+            onOpenEvent={(eventId) => navigate('detalhe', { eventId })}
+          />
+        );
       default:
         return <Placeholder label={TABS.find((t) => t.id === nav.screen)?.label ?? nav.screen} />;
     }
