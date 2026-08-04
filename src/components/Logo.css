@@ -1,0 +1,17 @@
+.logo-mark {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.logo-mark__bracket {
+  fill: none;
+  stroke: var(--accent-darkest);
+  stroke-width: 2.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.logo-mark__dot {
+  fill: var(--accent);
+}

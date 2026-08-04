@@ -10,6 +10,12 @@
   justify-content: space-between;
 }
 
+.home__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .home__wordmark {
   font-size: 26px;
   font-weight: 700;
