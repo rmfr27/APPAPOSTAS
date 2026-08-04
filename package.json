@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "vercel-build": "npm run fetch:odds && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
     "fetch:odds": "node scripts/fetchOdds.js"
