@@ -12,7 +12,7 @@ import {
 } from '../lib/predictions.js';
 import './Detalhe.css';
 
-export default function Detalhe({ eventId, onBack, favorites, onToggleFavorite, preferredBooks }) {
+export default function Detalhe({ eventId, onBack, favorites, onToggleFavorite, preferredBooks = null }) {
   const [activeMarketIndex, setActiveMarketIndex] = useState(0);
   const event = events.find((e) => e.id === eventId);
 
@@ -36,6 +36,23 @@ export default function Detalhe({ eventId, onBack, favorites, onToggleFavorite, 
   const activeMarket = event.markets[activeMarketIndex];
   const heroOutcome = favoriteOutcome(activeMarket);
   const heroOdd = bestOdd(heroOutcome);
+
+  // Bookmaker columns for the odds table: whichever books actually quote
+  // this market, most-covered first — sparse handicap/totals lines mean not
+  // every book appears on every outcome. `preferredBooks` (from a future
+  // Perfil screen) narrows this down when set; until then, show everything.
+  const bookCoverage = new Map();
+  activeMarket.outcomes.forEach((outcome) => {
+    Object.keys(outcome.odds).forEach((book) => {
+      bookCoverage.set(book, (bookCoverage.get(book) || 0) + 1);
+    });
+  });
+  const availableBooks = Array.from(bookCoverage.keys()).sort(
+    (a, b) => bookCoverage.get(b) - bookCoverage.get(a),
+  );
+  const visibleBooks = preferredBooks
+    ? availableBooks.filter((book) => preferredBooks.includes(book))
+    : availableBooks;
 
   const recommendedImplied = impliedProbability(recommended.odd);
   const rationale = `A IA atribui ${Math.round(recommended.predProb * 100)}% de probabilidade a "${recommended.outcome}" (${recommended.market}), ${
@@ -110,7 +127,7 @@ export default function Detalhe({ eventId, onBack, favorites, onToggleFavorite, 
       </div>
 
       <CornerCard className="detalhe__card odds-card">
-        {preferredBooks.length === 0 ? (
+        {visibleBooks.length === 0 ? (
           <p className="odds-empty">
             Sem casas de apostas selecionadas. Ative pelo menos uma em Perfil para comparar odds.
           </p>
@@ -119,20 +136,23 @@ export default function Detalhe({ eventId, onBack, favorites, onToggleFavorite, 
             <thead>
               <tr>
                 <th></th>
-                {preferredBooks.map((book) => (
+                {visibleBooks.map((book) => (
                   <th key={book}>{book}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {activeMarket.outcomes.map((outcome) => {
-                const visibleOdds = preferredBooks.map((book) => outcome.odds[book]);
-                const maxOdd = Math.max(...visibleOdds);
+                const visibleOdds = visibleBooks
+                  .map((book) => outcome.odds[book])
+                  .filter((value) => value != null);
+                const maxOdd = visibleOdds.length > 0 ? Math.max(...visibleOdds) : null;
                 return (
                   <tr key={outcome.label}>
                     <td>{outcome.label}</td>
-                    {preferredBooks.map((book) => {
+                    {visibleBooks.map((book) => {
                       const value = outcome.odds[book];
+                      if (value == null) return <td key={book}>—</td>;
                       return (
                         <td key={book} className={value === maxOdd ? 'odds-table__best' : ''}>
                           {value.toFixed(2)}

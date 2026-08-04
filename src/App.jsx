@@ -4,7 +4,6 @@ import Home from './screens/Home.jsx';
 import Eventos from './screens/Eventos.jsx';
 import Detalhe from './screens/Detalhe.jsx';
 import Placeholder from './screens/Placeholder.jsx';
-import { BOOKMAKERS } from './data/events.js';
 import './App.css';
 
 // Navigation model per the design handoff: `nav` (current screen + params)
@@ -16,9 +15,10 @@ function App() {
   const [nav, setNav] = useState({ screen: 'inicio', params: {} });
   const [, setHistory] = useState([]);
   const [favorites, setFavorites] = useState([]);
-  // Perfil (not built yet) will turn this into state with per-bookmaker
-  // toggles; until then every bookmaker is shown, matching its default.
-  const preferredBooks = BOOKMAKERS;
+  // Perfil (not built yet) will turn this into per-bookmaker toggle state;
+  // null means "no preference set", so Detalhe shows every book the event
+  // actually has odds from.
+  const preferredBooks = null;
 
   function setTab(tabId) {
     setHistory([]);
