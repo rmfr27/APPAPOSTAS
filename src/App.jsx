@@ -1,33 +1,85 @@
 import { useState } from 'react';
 import TabBar, { TABS } from './components/TabBar.jsx';
 import Home from './screens/Home.jsx';
+import Eventos from './screens/Eventos.jsx';
+import Detalhe from './screens/Detalhe.jsx';
 import Placeholder from './screens/Placeholder.jsx';
+import { BOOKMAKERS } from './data/events.js';
 import './App.css';
 
-// Only Início is fully implemented so far — the other tab roots render a
-// placeholder until their own screens land. The design handoff's full nav
-// model also has a `history` push/pop stack for drilling into Eventos and
-// Detalhe; that arrives with those screens.
+// Navigation model per the design handoff: `nav` (current screen + params)
+// plus a `history` stack. Tab taps reset history (tab roots have no back
+// button); `navigate` pushes the current nav onto history so `goBack` can
+// pop it. Eventos and Detalhe are the only drill-down (non tab-root) screens
+// implemented so far.
 function App() {
-  const [screen, setScreen] = useState('inicio');
+  const [nav, setNav] = useState({ screen: 'inicio', params: {} });
+  const [, setHistory] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+  // Perfil (not built yet) will turn this into state with per-bookmaker
+  // toggles; until then every bookmaker is shown, matching its default.
+  const preferredBooks = BOOKMAKERS;
 
   function setTab(tabId) {
-    setScreen(tabId);
+    setHistory([]);
+    setNav({ screen: tabId, params: {} });
+  }
+
+  function navigate(screen, params = {}) {
+    setHistory((h) => [...h, nav]);
+    setNav({ screen, params });
+  }
+
+  function goBack() {
+    setHistory((h) => {
+      if (h.length === 0) return h;
+      setNav(h[h.length - 1]);
+      return h.slice(0, -1);
+    });
+  }
+
+  function toggleFavorite(eventId) {
+    setFavorites((favs) =>
+      favs.includes(eventId) ? favs.filter((id) => id !== eventId) : [...favs, eventId],
+    );
   }
 
   function renderScreen() {
-    switch (screen) {
+    switch (nav.screen) {
       case 'inicio':
-        return <Home onSelectSport={() => {}} />;
+        return (
+          <Home
+            onSelectSport={(sport) => navigate('eventos', { sport })}
+            onOpenEvent={(eventId) => navigate('detalhe', { eventId })}
+          />
+        );
+      case 'eventos':
+        return (
+          <Eventos
+            sport={nav.params.sport}
+            onBack={goBack}
+            onOpenEvent={(eventId) => navigate('detalhe', { eventId })}
+          />
+        );
+      case 'detalhe':
+        return (
+          <Detalhe
+            eventId={nav.params.eventId}
+            onBack={goBack}
+            favorites={favorites}
+            onToggleFavorite={toggleFavorite}
+            preferredBooks={preferredBooks}
+          />
+        );
       default:
-        return <Placeholder label={TABS.find((t) => t.id === screen)?.label ?? screen} />;
+        return <Placeholder label={TABS.find((t) => t.id === nav.screen)?.label ?? nav.screen} />;
     }
   }
 
   return (
     <div className="phone-frame">
       {renderScreen()}
-      <TabBar active={screen} onSelect={setTab} />
+      <TabBar active={nav.screen} onSelect={setTab} />
     </div>
   );
 }

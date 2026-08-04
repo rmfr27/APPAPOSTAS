@@ -1,0 +1,190 @@
+.detalhe {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px 20px;
+}
+
+.detalhe__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.detalhe__fav {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--accent-dark);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.detalhe__title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 6px 0 2px;
+}
+
+.detalhe__date {
+  font-size: 12px;
+  color: var(--muted-2);
+  margin-bottom: 20px;
+}
+
+.detalhe__card {
+  margin-bottom: 16px;
+}
+
+.detalhe__card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.detalhe__card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent-darkest);
+  margin: 0;
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+}
+
+.prob-row {
+  margin-bottom: 10px;
+}
+
+.prob-row:last-child {
+  margin-bottom: 0;
+}
+
+.prob-row__top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.prob-row__track {
+  height: 6px;
+  background: var(--surface);
+}
+
+.prob-row__fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+.recommended__market {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent-darkest);
+}
+
+.recommended__odd {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent-mid);
+  margin: 4px 0 8px;
+}
+
+.recommended__rationale {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.hero-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.hero-stat__label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.hero-stat__value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent-mid);
+}
+
+.market-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.market-tab {
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.market-tab--active {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+
+.odds-card {
+  overflow-x: auto;
+}
+
+.odds-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
+
+.odds-table th,
+.odds-table td {
+  padding: 8px 6px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.odds-table th:first-child,
+.odds-table td:first-child {
+  text-align: left;
+}
+
+.odds-table__best {
+  background: var(--accent-tint);
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.odds-empty {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.detalhe__legal {
+  font-size: 10px;
+  color: var(--muted-2);
+  margin-top: 8px;
+}

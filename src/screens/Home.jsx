@@ -3,7 +3,7 @@ import { SPORTS, events } from '../data/events.js';
 import { getValueHighlights, getUpcoming, formatDate } from '../lib/predictions.js';
 import './Home.css';
 
-export default function Home({ onSelectSport }) {
+export default function Home({ onSelectSport, onOpenEvent }) {
   const highlights = getValueHighlights(events);
   const upcoming = getUpcoming(events).slice(0, 5);
 
@@ -34,7 +34,13 @@ export default function Home({ onSelectSport }) {
         <h2 className="home__section-title heading">Destaques de valor</h2>
         <div className="home__highlights">
           {highlights.map(({ event, best }) => (
-            <CornerCard key={event.id} className="highlight-card">
+            <CornerCard
+              key={event.id}
+              className="highlight-card"
+              onClick={() => onOpenEvent(event.id)}
+              role="button"
+              tabIndex={0}
+            >
               <div className="highlight-card__top">
                 <span className="tag">{event.competition}</span>
                 <span className="tag tag--value">
@@ -62,7 +68,19 @@ export default function Home({ onSelectSport }) {
         <h2 className="home__section-title heading">Próximos eventos</h2>
         <div className="upcoming-list">
           {upcoming.map(({ event, best }) => (
-            <div key={event.id} className="upcoming-row">
+            <div
+              key={event.id}
+              className="upcoming-row"
+              onClick={() => onOpenEvent(event.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onOpenEvent(event.id);
+                }
+              }}
+            >
               <div className="upcoming-row__meta">
                 {SPORTS.find((s) => s.id === event.sport)?.label} · {event.competition}
               </div>
