@@ -6,7 +6,9 @@ import Eventos from './screens/Eventos.jsx';
 import Detalhe from './screens/Detalhe.jsx';
 import Combos from './screens/Combos.jsx';
 import Favoritos from './screens/Favoritos.jsx';
+import Perfil from './screens/Perfil.jsx';
 import Placeholder from './screens/Placeholder.jsx';
+import { BOOKMAKERS } from './data/events.js';
 import './App.css';
 
 // Navigation model per the design handoff: `nav` (current screen + params)
@@ -18,10 +20,12 @@ function App() {
   const [nav, setNav] = useState({ screen: 'inicio', params: {} });
   const [, setHistory] = useState([]);
   const [favorites, setFavorites] = useState([]);
-  // Perfil (not built yet) will turn this into per-bookmaker toggle state;
-  // null means "no preference set", so Detalhe shows every book the event
-  // actually has odds from.
-  const preferredBooks = null;
+  // null = no preference set, so Detalhe shows every book an event actually
+  // has odds from (real events don't use the fixed PT bookmaker names below,
+  // so defaulting to BOOKMAKERS here would filter every live event's table
+  // down to nothing). Perfil's toggles only narrow this once the user
+  // actually turns one off — see toggleBook.
+  const [preferredBooks, setPreferredBooks] = useState(null);
 
   function setTab(tabId) {
     setHistory([]);
@@ -45,6 +49,15 @@ function App() {
     setFavorites((favs) =>
       favs.includes(eventId) ? favs.filter((id) => id !== eventId) : [...favs, eventId],
     );
+  }
+
+  function toggleBook(book) {
+    setPreferredBooks((books) => {
+      // null reads as "every PT bookmaker is on" — the first toggle turns
+      // that into a real list instead of computing against an empty set.
+      const current = books ?? BOOKMAKERS;
+      return current.includes(book) ? current.filter((b) => b !== book) : [...current, book];
+    });
   }
 
   function renderScreen() {
@@ -90,6 +103,8 @@ function App() {
             onOpenEvent={(eventId) => navigate('detalhe', { eventId })}
           />
         );
+      case 'perfil':
+        return <Perfil preferredBooks={preferredBooks} onToggleBook={toggleBook} />;
       default:
         return <Placeholder label={TABS.find((t) => t.id === nav.screen)?.label ?? nav.screen} />;
     }
