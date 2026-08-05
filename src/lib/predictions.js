@@ -115,6 +115,30 @@ export function getValueBets(events) {
     .sort((a, b) => b.bet.edge - a.bet.edge);
 }
 
+// Shared leg shape for the combo builder — used both by generateCombo below
+// and by manually picking a bet straight from the Seguras/Valor lists.
+export function makeComboLeg(event, bet, tag) {
+  return {
+    event: `${event.teamA} vs ${event.teamB}`,
+    eventId: event.id,
+    market: bet.market,
+    outcome: bet.outcome,
+    odd: bet.odd,
+    predProb: bet.predProb,
+    tag,
+  };
+}
+
+export function comboTotals(legs) {
+  if (legs.length === 0) return { totalOdd: null, totalProb: null };
+  const totalOdd = legs.reduce((acc, leg) => acc * leg.odd, 1);
+  // Combined probability assumes independence across legs (fair for
+  // different matches, same devig/mock predProb each leg already carries —
+  // see README "Data — Important" for what that number actually represents).
+  const totalProb = legs.reduce((acc, leg) => acc * leg.predProb, 1);
+  return { totalOdd: totalOdd.toFixed(2), totalProb };
+}
+
 // Combo/accumulator generation, per the README's four pools:
 // "segura"/"valor" pull straight from the respective sorted list (no
 // duplicate events); "mista" interleaves both lists; "ia" scores every safe
@@ -124,22 +148,8 @@ export function getValueBets(events) {
 export function generateCombo(events, pool, count) {
   const safe = getSafeBets(events);
   const value = getValueBets(events);
-  const legFromSafe = ({ event, bet }) => ({
-    event: `${event.teamA} vs ${event.teamB}`,
-    market: bet.market,
-    outcome: bet.outcome,
-    odd: bet.odd,
-    predProb: bet.predProb,
-    tag: 'Segura',
-  });
-  const legFromValue = ({ event, bet }) => ({
-    event: `${event.teamA} vs ${event.teamB}`,
-    market: bet.market,
-    outcome: bet.outcome,
-    odd: bet.odd,
-    predProb: bet.predProb,
-    tag: 'Valor',
-  });
+  const legFromSafe = ({ event, bet }) => makeComboLeg(event, bet, 'Segura');
+  const legFromValue = ({ event, bet }) => makeComboLeg(event, bet, 'Valor');
 
   const used = new Set();
   const chosen = [];
@@ -193,16 +203,7 @@ export function generateCombo(events, pool, count) {
     }
   }
 
-  const totalOdd = chosen.reduce((acc, leg) => acc * leg.odd, 1);
-  // Combined probability assumes independence across legs (fair for
-  // different matches, same devig/mock predProb each leg already carries —
-  // see README "Data — Important" for what that number actually represents).
-  const totalProb = chosen.reduce((acc, leg) => acc * leg.predProb, 1);
-  return {
-    legs: chosen,
-    totalOdd: chosen.length ? totalOdd.toFixed(2) : null,
-    totalProb: chosen.length ? totalProb : null,
-  };
+  return { legs: chosen, ...comboTotals(chosen) };
 }
 
 export function confidenceLabel(predProb) {
