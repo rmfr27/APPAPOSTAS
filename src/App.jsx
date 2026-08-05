@@ -26,6 +26,12 @@ function App() {
   // down to nothing). Perfil's toggles only narrow this once the user
   // actually turns one off — see toggleBook.
   const [preferredBooks, setPreferredBooks] = useState(null);
+  // Lifted out of Combos so it survives tapping into Detalhe (e.g. to check
+  // an event before picking it) and back — Combos itself unmounts on
+  // navigation, which would otherwise wipe an in-progress combo.
+  const [comboPool, setComboPool] = useState('mista');
+  const [comboCount, setComboCount] = useState(3);
+  const [combo, setCombo] = useState({ legs: [], totalOdd: null, totalProb: null });
 
   function setTab(tabId) {
     setHistory([]);
@@ -95,7 +101,17 @@ function App() {
           />
         );
       case 'combos':
-        return <Combos onOpenEvent={(eventId) => navigate('detalhe', { eventId })} />;
+        return (
+          <Combos
+            onOpenEvent={(eventId) => navigate('detalhe', { eventId })}
+            comboPool={comboPool}
+            onComboPoolChange={setComboPool}
+            comboCount={comboCount}
+            onComboCountChange={setComboCount}
+            combo={combo}
+            onComboChange={setCombo}
+          />
+        );
       case 'favoritos':
         return (
           <Favoritos
