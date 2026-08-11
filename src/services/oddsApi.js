@@ -42,15 +42,21 @@ export async function fetchOdds(sportKey, {
 }
 
 export function normalizeToEvents(apiData) {
-  return apiData.map((item) => ({
-    id: item.id,
-    sport: mapSport(item.sport_key),
-    competition: item.sport_title || item.sport_key,
-    teamA: item.home_team,
-    teamB: item.away_team,
-    date: item.commence_time ? item.commence_time.split('T')[0] : item.commence_time,
-    markets: flattenMarkets(item.bookmakers || [], item.home_team, item.away_team),
-  }));
+  return apiData
+    .map((item) => ({
+      id: item.id,
+      sport: mapSport(item.sport_key),
+      competition: item.sport_title || item.sport_key,
+      teamA: item.home_team,
+      teamB: item.away_team,
+      date: item.commence_time ? item.commence_time.split('T')[0] : item.commence_time,
+      markets: flattenMarkets(item.bookmakers || [], item.home_team, item.away_team),
+    }))
+    // Fixtures far enough out that no bookmaker has posted odds yet come
+    // back with bookmakers: [] (or none matching MARKET_NAMES), leaving
+    // markets empty. Every predictions.js helper assumes at least one
+    // market exists, so drop those here instead of null-checking everywhere.
+    .filter((event) => event.markets.length > 0);
 }
 
 function flattenMarkets(bookmakers, homeTeam, awayTeam) {
