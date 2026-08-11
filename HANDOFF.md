@@ -48,6 +48,14 @@ Todos os 7 ecrãs do handoff estão feitos. #4–#8 foram todos criados a partir
 - **Validado no browser** (Playwright headless, 2026-08-04): Home → Futebol → evento → Detalhe → troca de mercado, sem erros de consola. "Destaques de valor" mostra apostas de valor reais genuínas (ex. 4.90 na Coolbet, 9.00 na Tipico) — funciona porque o edge vem de comparar o consenso devig com a **melhor odd entre ~20 casas**, o que é um sinal de "price shopping" legítimo, não ruído.
 - **Nomes de equipas** ainda não foram testados contra o dataset do football-data.co.uk (secção seguinte) — só relevante se as duas fontes forem cruzadas no futuro.
 
+### Manter os dados frescos sem pushes manuais (2026-08-11)
+Os dados só são buscados no **build** (`vercel-build` = `npm run fetch:odds && vite build`) — sem um push novo, o site fica com odds cada vez mais velhas (reparámos nisto quando o site mostrou um evento de um torneio de ténis já terminado, uma semana sem deploys).
+
+Resolvido com um redeploy agendado, não com fetch em runtime (a app continua estática, sem backend):
+- **Deploy hook** criado no Vercel (`odds-refresh`, branch `main`) — um URL que, quando recebe um POST, dispara um build novo.
+- **`.github/workflows/refresh-odds.yml`** — GitHub Action agendada (`cron: '13 */12 * * *'`, 2×/dia) que faz `curl -X POST` a esse hook. O URL está guardado como secret do repo (`VERCEL_DEPLOY_HOOK_URL`), não no código.
+- **Porquê 2×/dia e não mais**: o free tier da The Odds API dá 500 pedidos/mês. Cada build gasta ~3-6 pedidos (EPL, La Liga, NBA + torneios de ténis ativos nesse momento — `/v4/sports` para listar torneios não conta para a quota). A 2×/dia = ~60 builds/mês = ~360 pedidos, com folga para deploys manuais/PRs. A 4×/dia já ultrapassava a quota. Se quiseres mais frequência, ou aumentas o intervalo do cron ou precisas de um plano pago da API.
+
 ## Exploração de Machine Learning para previsões (2026-08-04, não está no repo)
 Explorado fora do repo (`scratchpad`, não commitado) para responder à pergunta "como melhorar a previsão IA com dados estatísticos": zerozero.pt não tem API e scraping arrisca violar os termos de uso deles, por isso não é boa fonte. Em vez disso:
 - **Fonte de dados de treino escolhida**: [football-data.co.uk](https://www.football-data.co.uk/portugalm.php) (⚠️ nome parecido com football-data.org, mas é outro site) — CSVs grátis, sem API key, com resultados históricos + odds de ~10 bookmakers por jogo, Liga Portugal desde 1993/94. Padrão de URL: `https://www.football-data.co.uk/mmz4281/{época ex. 2425}/P1.csv`.

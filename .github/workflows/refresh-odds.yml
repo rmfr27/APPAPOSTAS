@@ -1,0 +1,20 @@
+name: Refresh odds
+
+# The site only fetches new odds at build time (npm run vercel-build), so
+# without this it goes stale the moment nobody pushes for a while. This
+# just re-triggers a Vercel production build on a schedule; the build
+# itself does the actual fetching. See HANDOFF.md for the quota math
+# behind the twice-a-day interval.
+on:
+  schedule:
+    - cron: '13 */12 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel deploy hook
+        run: curl -fsS -X POST "$VERCEL_DEPLOY_HOOK_URL"
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
