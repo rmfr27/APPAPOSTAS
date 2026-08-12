@@ -27,8 +27,11 @@ PRs já mesclados (todos por squash):
 - **#12** — Combos: permitir escolher apostas manualmente de Seguras/Valor para o combinado
 - **#13** — redeploy agendado para as odds não ficarem stale entre pushes (ver secção "Manter os dados frescos" abaixo)
 - **#14** — fix de produção: descartar eventos sem odds ainda
+- **#15** — Combos: threshold de Apostas Seguras 60%→80%, escolhe a melhor odd acima do threshold
+- **#16** — descoberta dinâmica de todos os desportos ativos (era só EPL/La Liga/NBA/ténis)
+- **#17** — análise IA de lesões/táticas/forma recente via Claude + pesquisa web
 
-Todos os 7 ecrãs do handoff estão feitos. #4–#8 foram todos criados a partir do mesmo commit de `main` (em paralelo, não empilhados), por isso o merge de cada um a seguir ao anterior exigiu rebase + resolver conflitos em `App.jsx` (e `predictions.js` entre #5/#6) — nada de grave, só imports/`switch` a combinar, exceto um ponto real descrito abaixo.
+Todos os 7 ecrãs do handoff estão feitos. #4–#8 foram todos criados a partir do mesmo commit de `main` (em paralelo, não empilhados), por isso o merge de cada um a seguir ao anterior exigiu rebase + resolver conflitos em `App.jsx` (e `predictions.js` entre #5/#6) — nada de grave, só imports/`switch` a combinar, exceto um ponto real descrito abaixo. Mesma situação entre #15–#17: partiram todos do mesmo commit, #15 mesclou limpo (ficheiros diferentes), #17 precisou de rebase para resolver as duas secções novas do `HANDOFF.md` (#16 e #17) que caíam no mesmo sítio do ficheiro.
 
 **Decisão tomada ao mesclar #8 (Perfil) por cima de #4 (odds reais)**: o #8 tinha `preferredBooks` a arrancar como `useState(BOOKMAKERS)` (as 5 casas PT). Isso participava mal com o #4, que já tinha decidido mostrar bookmakers internacionais reais — se o default fosse a lista fixa PT, a tabela de odds de **todo** evento real ficava vazia por defeito (interseção de PT-5 com bookmakers reais = sempre nada), escondendo a funcionalidade toda sem o utilizador tocar em nada. Resolvido para `useState(null)` (`null` = sem restrição, mostra tudo — já era o contrato que `Detalhe.jsx` esperava desde o #4). `Perfil.jsx` trata `null` como "as 5 casas PT aparecem todas ligadas"; o primeiro toggle que o utilizador fizer converte isso numa lista real (`toggleBook` em `App.jsx` expande a partir de `BOOKMAKERS` nesse momento). Testado no browser com dados reais e mock depois da resolução — funciona nos dois casos.
 
