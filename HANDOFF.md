@@ -70,6 +70,18 @@ Resolvido com um redeploy agendado, não com fetch em runtime (a app continua es
 
 **Efeito colateral a monitorizar**: `src/data/events.js` importa `live_events.json` estaticamente (`import.meta.glob(..., { eager: true })`), por isso os 869 eventos ficam todos embutidos no bundle JS — o `vite build` já avisa que o chunk passou de ~67KB para ~353KB gzip. Não é um erro, mas se a cobertura continuar a crescer vale a pena mudar para fetch em runtime ou lazy-loading em vez de import estático.
 
+## Análise IA de lesões/táticas/forma recente (2026-08-12)
+Pedido do Ruben: além do consenso de mercado (devig), ter em conta lesões, alterações táticas e forma recente na análise de cada jogo. A app não tem nenhuma fonte de dados para isto — resolvido com um LLM (Claude, `claude-sonnet-5`) com a ferramenta de pesquisa web, corrido no momento do build, um pedido por evento.
+
+- **`scripts/analyzeEvents.js`** — novo script, corre a seguir ao `fetch:odds` (`vercel-build` = `fetch:odds && analyze:events && vite build`). Lê `src/data/live_events.json`, e para cada evento elegível faz **um único pedido não-streaming** a `client.messages.create` com duas ferramentas: `web_search_20260209` (server-side, a API resolve as pesquisas sozinha) e uma ferramenta custom `submit_analysis` que força uma resposta estruturada (resumo em PT-PT + `leaning` + `confidence_adjustment_pp`). Quando o Claude chama `submit_analysis`, a resposta pára com `tool_use` e o `input` já vem parseado — não é preciso loop de agente nem enviar `tool_result` de volta.
+- **Elegibilidade**: só eventos que começam nos próximos 3 dias (`WINDOW_DAYS`), até 40 por build (`MAX_EVENTS`), 4 pedidos em paralelo (`CONCURRENCY`) — para limitar custo/tempo de build. Ajustar estas constantes no topo do ficheiro se quiseres mais/menos cobertura.
+- **Aplicação do ajuste**: só ao mercado principal (`event.markets[0]`, a mesma convenção que `predictions.js` usa em todo o lado). `confidence_adjustment_pp` é sempre clampado a ±8pp mesmo que o modelo devolva algo fora do intervalo pedido no schema; o resto do mercado é renormalizado proporcionalmente para continuar a somar 1. `leaning: "neutro"` ou ajuste 0 → não mexe em nada.
+- **Resiliência**: sem `ANTHROPIC_API_KEY` definida, o script salta tudo e não toca no ficheiro (testado). Se uma chamada individual falhar (rate limit, sem `submit_analysis` chamado, erro de rede), esse evento fica sem `event.analysis` e mantém o `predProb` puro do consenso — nunca fica a app num estado quebrado por causa disto.
+- **Novo secret**: `ANTHROPIC_API_KEY`, em `.env.example`. Precisa de estar também nas Environment Variables do projeto na Vercel (o script corre lá durante o `vercel-build`, tal como o `ODDS_API_KEY`).
+- **UI**: novo card "Análise" em `Detalhe.jsx`, a seguir a "Aposta recomendada pela IA", só aparece quando `event.analysis` existe.
+- **Custo — não confirmado com números reais ainda**: pesquisa web + tokens Sonnet 5, por evento, por build. Ordem de grandeza aproximada (não validada com faturação real): poucos cêntimos por evento; com 40 eventos × 2 builds/dia isso pode somar dezenas de euros/mês. Vale a pena o Ruben acompanhar o gasto real na consola da Anthropic depois dos primeiros builds — `WINDOW_DAYS`/`MAX_EVENTS` são os botões para ajustar isto para baixo.
+- **Não testado ainda com a API real** (não tenho `ANTHROPIC_API_KEY` nesta sessão) — testei o caminho sem chave (salta corretamente), a matemática do ajuste de probabilidade (renormalização, clamp, `neutro`) isoladamente, e o card na UI com um `analysis` sintético injetado em `live_events.json`. Falta correr `npm run analyze:events` com uma chave real para confirmar que o Claude chama `submit_analysis` de forma fiável e que os resumos ficam com qualidade útil — fazer isso antes ou logo depois do merge.
+
 ## Exploração de Machine Learning para previsões (2026-08-04, não está no repo)
 Explorado fora do repo (`scratchpad`, não commitado) para responder à pergunta "como melhorar a previsão IA com dados estatísticos": zerozero.pt não tem API e scraping arrisca violar os termos de uso deles, por isso não é boa fonte. Em vez disso:
 - **Fonte de dados de treino escolhida**: [football-data.co.uk](https://www.football-data.co.uk/portugalm.php) (⚠️ nome parecido com football-data.org, mas é outro site) — CSVs grátis, sem API key, com resultados históricos + odds de ~10 bookmakers por jogo, Liga Portugal desde 1993/94. Padrão de URL: `https://www.football-data.co.uk/mmz4281/{época ex. 2425}/P1.csv`.
@@ -88,9 +100,11 @@ Todos os 7 ecrãs do handoff (Início, Explorar, Eventos, Detalhe, Combos, Favor
 ## Como correr localmente
 ```bash
 npm install
-npm run dev      # servidor de desenvolvimento (vite)
-npm run lint     # oxlint
-npm run build    # build de produção
+npm run dev            # servidor de desenvolvimento (vite)
+npm run lint           # oxlint
+npm run build          # build de produção
+npm run fetch:odds     # busca odds reais (precisa de ODDS_API_KEY no .env)
+npm run analyze:events # análise IA de lesões/táticas (precisa de ANTHROPIC_API_KEY no .env; salta se não existir)
 ```
 
 Nó/npm instalados via winget nesta máquina (`OpenJS.NodeJS.LTS`). GitHub CLI também via winget (`GitHub.cli`).
