@@ -108,6 +108,15 @@ export default function Detalhe({ eventId, onBack, favorites, onToggleFavorite, 
         <p className="recommended__rationale">{rationale}</p>
       </CornerCard>
 
+      {event.analysis && (
+        <CornerCard className="detalhe__card">
+          <div className="detalhe__card-header">
+            <h2 className="detalhe__card-title heading">Análise</h2>
+          </div>
+          <p className="recommended__rationale">{event.analysis.summary}</p>
+        </CornerCard>
+      )}
+
       <div className="hero-stat">
         <span className="hero-stat__label">Melhor odd agora ({activeMarket.name})</span>
         <span className="hero-stat__value heading">{heroOdd.odd.toFixed(2)}</span>
