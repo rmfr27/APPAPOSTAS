@@ -55,7 +55,7 @@ export default function Combos({
 
       <div className="combos__section-header">
         <h2 className="combos__section-title heading">🛡 Apostas Seguras</h2>
-        <span className="combos__section-hint">confiança IA ≥ 60%</span>
+        <span className="combos__section-hint">confiança IA ≥ 80%</span>
       </div>
       <div className="bet-list">
         {safeBets.map(({ event, bet }) => {

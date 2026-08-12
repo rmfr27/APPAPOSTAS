@@ -85,20 +85,27 @@ export function getRankedPredictions(events, count = 5) {
     .slice(0, count);
 }
 
-// A "safe bet" is the single highest-predicted-probability outcome across
-// all markets, only surfaced when that probability is >= 60% (the "Apostas
-// Seguras" threshold from the design handoff).
-export function bestSafeBet(event) {
+// The "Apostas Seguras" confidence threshold — only outcomes the AI is at
+// least this sure about are eligible, across every market.
+export const SAFE_BET_THRESHOLD = 0.8;
+
+// A "safe bet" is, among all outcomes across all markets that clear
+// SAFE_BET_THRESHOLD, the one with the best available odd — not necessarily
+// the highest-probability one. This maximises payout while keeping the
+// confidence floor, per the product decision behind the 60%→80% threshold
+// change (2026-08-12).
+export function bestSafeBet(event, threshold = SAFE_BET_THRESHOLD) {
   let best = null;
   for (const market of event.markets) {
     for (const outcome of market.outcomes) {
-      if (!best || outcome.predProb > best.predProb) {
-        const { odd, bookmaker } = bestOdd(outcome);
+      if (outcome.predProb < threshold) continue;
+      const { odd, bookmaker } = bestOdd(outcome);
+      if (!best || odd > best.odd) {
         best = { market: market.name, outcome: outcome.label, predProb: outcome.predProb, odd, bookmaker };
       }
     }
   }
-  return best && best.predProb >= 0.6 ? best : null;
+  return best;
 }
 
 export function getSafeBets(events) {
