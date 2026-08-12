@@ -4,6 +4,12 @@ export const SPORTS = [
   { id: 'futebol', label: 'Futebol' },
   { id: 'basquetebol', label: 'Basquetebol' },
   { id: 'tenis', label: 'Ténis' },
+  { id: 'futebol-americano', label: 'Futebol Americano' },
+  { id: 'hoquei', label: 'Hóquei no Gelo' },
+  { id: 'basebol', label: 'Basebol' },
+  { id: 'mma', label: 'MMA' },
+  { id: 'boxe', label: 'Boxe' },
+  { id: 'rugby', label: 'Rugby' },
 ];
 
 // Illustrative placeholder data only — see README "Data — Important". Used
