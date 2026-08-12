@@ -21,6 +21,12 @@ PRs já mesclados (todos por squash):
 - **#6** — ecrã Combos
 - **#7** — ecrã Favoritos
 - **#8** — ecrã Perfil
+- **#9** — logo/favicon da app
+- **#10** — Combos: mostrar probabilidade de vitória por perna e combinada
+- **#11** — Combos: remover pernas individuais de um combinado gerado
+- **#12** — Combos: permitir escolher apostas manualmente de Seguras/Valor para o combinado
+- **#13** — redeploy agendado para as odds não ficarem stale entre pushes (ver secção "Manter os dados frescos" abaixo)
+- **#14** — fix de produção: descartar eventos sem odds ainda
 
 Todos os 7 ecrãs do handoff estão feitos. #4–#8 foram todos criados a partir do mesmo commit de `main` (em paralelo, não empilhados), por isso o merge de cada um a seguir ao anterior exigiu rebase + resolver conflitos em `App.jsx` (e `predictions.js` entre #5/#6) — nada de grave, só imports/`switch` a combinar, exceto um ponto real descrito abaixo.
 
@@ -55,6 +61,14 @@ Resolvido com um redeploy agendado, não com fetch em runtime (a app continua es
 - **Deploy hook** criado no Vercel (`odds-refresh`, branch `main`) — um URL que, quando recebe um POST, dispara um build novo.
 - **`.github/workflows/refresh-odds.yml`** — GitHub Action agendada (`cron: '13 */12 * * *'`, 2×/dia) que faz `curl -X POST` a esse hook. O URL está guardado como secret do repo (`VERCEL_DEPLOY_HOOK_URL`), não no código.
 - **Porquê 2×/dia e não mais**: o free tier da The Odds API dá 500 pedidos/mês. Cada build gasta ~3-6 pedidos (EPL, La Liga, NBA + torneios de ténis ativos nesse momento — `/v4/sports` para listar torneios não conta para a quota). A 2×/dia = ~60 builds/mês = ~360 pedidos, com folga para deploys manuais/PRs. A 4×/dia já ultrapassava a quota. Se quiseres mais frequência, ou aumentas o intervalo do cron ou precisas de um plano pago da API.
+- **Atualizado em 2026-08-12**: o Ruben fez upgrade a um plano pago da The Odds API, especificamente para suportar a expansão de desportos abaixo — o free tier estourou a quota em minutos assim que passámos de 4 chaves de desporto fixas para "todos".
+
+### Alargar a todos os desportos (2026-08-12)
+`scripts/fetchOdds.js` deixou de ter uma lista fixa de desportos — `fetchActiveSportKeys()` (em `oddsApi.js`) descobre todos os desportos ativos via `/v4/sports`, filtrados a uma allowlist de grupos de confronto direto (Soccer, Basketball, American Football, Ice Hockey, Baseball, Tennis, Rugby League, Rugby Union, Boxing, Mixed Martial Arts) e excluindo chaves `_winner` (torneios de vencedor único, sem mercado h2h por jogo). Testado com a chave paga: **869 eventos** reais (futebol 488, futebol americano 133, ténis 66, MMA 48, basebol 36, boxe 42, basquetebol 20, hóquei 20, rugby 16).
+
+**Descoberta importante**: o pedido original também tentava juntar mercados de 1ª/2ª parte e Ambas Marcam (`h2h_h1`, `h2h_h2`, `totals_h1`, `totals_h2`, `btts`) ao pedido de odds em lote (`/v4/sports/{sport}/odds`) para o futebol. **Isso não é suportado neste endpoint** — devolve 422 `INVALID_MARKET` e faz o pedido inteiro falhar (não só os mercados extra; **nenhum** dado volta). Ficou revertido — o futebol continua só com Resultado Final / Total de Pontos / Handicap. Para ter esses mercados extra seria preciso o endpoint de odds por evento (`/v4/sports/{sport}/events/{id}/odds`), um pedido por evento — mais caro/lento, não feito por agora.
+
+**Efeito colateral a monitorizar**: `src/data/events.js` importa `live_events.json` estaticamente (`import.meta.glob(..., { eager: true })`), por isso os 869 eventos ficam todos embutidos no bundle JS — o `vite build` já avisa que o chunk passou de ~67KB para ~353KB gzip. Não é um erro, mas se a cobertura continuar a crescer vale a pena mudar para fetch em runtime ou lazy-loading em vez de import estático.
 
 ## Exploração de Machine Learning para previsões (2026-08-04, não está no repo)
 Explorado fora do repo (`scratchpad`, não commitado) para responder à pergunta "como melhorar a previsão IA com dados estatísticos": zerozero.pt não tem API e scraping arrisca violar os termos de uso deles, por isso não é boa fonte. Em vez disso:
