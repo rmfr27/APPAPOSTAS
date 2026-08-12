@@ -7,10 +7,29 @@ const MARKET_NAMES = {
   spreads: 'Handicap',
 };
 
-// Tennis has no stable "circuit" sport key — the API keys each active
-// tournament individually (e.g. "tennis_atp_canadian_open") and that changes
-// week to week. Call this to get whichever ATP/WTA keys are live right now.
-export async function fetchActiveTennisKeys() {
+// The Odds API groups its sport keys by `group` (e.g. "Soccer", "Tennis") and
+// includes tournament-winner/outright keys (e.g. "soccer_epl_winner") mixed
+// in with per-match ones — those only carry an "outrights" market, not
+// h2h/totals/spreads, so requesting them wastes a request. This allowlist
+// keeps only groups that are real head-to-head sports; the `_winner` suffix
+// check drops the obvious outright keys before we even ask for their odds.
+const SPORT_GROUPS = new Set([
+  'Soccer',
+  'Basketball',
+  'American Football',
+  'Ice Hockey',
+  'Baseball',
+  'Tennis',
+  'Rugby League',
+  'Rugby Union',
+  'Boxing',
+  'Mixed Martial Arts',
+]);
+
+// Discovers every currently-active sport key the API offers (not a fixed
+// list) — includes tennis, whose tournaments have no stable "circuit" key
+// and rotate week to week (e.g. "tennis_atp_canadian_open").
+export async function fetchActiveSportKeys() {
   const key = process.env.ODDS_API_KEY;
   if (!key) throw new Error('ODDS_API_KEY not set in environment');
 
@@ -20,7 +39,9 @@ export async function fetchActiveTennisKeys() {
     throw new Error(`Odds API error ${res.status}: ${txt}`);
   }
   const sports = await res.json();
-  return sports.filter((s) => s.active && /^tennis_(atp|wta)_/.test(s.key)).map((s) => s.key);
+  return sports
+    .filter((s) => s.active && SPORT_GROUPS.has(s.group) && !s.key.endsWith('_winner'))
+    .map((s) => s.key);
 }
 
 export async function fetchOdds(sportKey, {
@@ -124,7 +145,13 @@ function mapSport(sportKey) {
   if (sportKey.includes('soccer')) return 'futebol';
   if (sportKey.includes('basketball')) return 'basquetebol';
   if (sportKey.includes('tennis')) return 'tenis';
+  if (sportKey.includes('americanfootball')) return 'futebol-americano';
+  if (sportKey.includes('icehockey')) return 'hoquei';
+  if (sportKey.includes('baseball')) return 'basebol';
+  if (sportKey.includes('mma')) return 'mma';
+  if (sportKey.includes('boxing')) return 'boxe';
+  if (sportKey.includes('rugby')) return 'rugby';
   return sportKey;
 }
 
-export default { fetchOdds, fetchActiveTennisKeys, normalizeToEvents };
+export default { fetchOdds, fetchActiveSportKeys, normalizeToEvents };

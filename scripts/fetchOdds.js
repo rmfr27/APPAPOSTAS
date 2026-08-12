@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { fetchOdds, fetchActiveTennisKeys, normalizeToEvents } from '../src/services/oddsApi.js';
+import { fetchOdds, fetchActiveSportKeys, normalizeToEvents } from '../src/services/oddsApi.js';
 
 try {
   process.loadEnvFile(path.resolve('.env'));
@@ -11,11 +11,11 @@ try {
 const OUT = path.resolve('src/data/live_events.json');
 
 async function main() {
-  const sportKeys = ['soccer_epl', 'soccer_spain_la_liga', 'basketball_nba'];
+  let sportKeys = [];
   try {
-    sportKeys.push(...(await fetchActiveTennisKeys()));
+    sportKeys = await fetchActiveSportKeys();
   } catch (err) {
-    console.error('Error listing active tennis tournaments', err.message);
+    console.error('Error listing active sports', err.message);
   }
 
   let all = [];
