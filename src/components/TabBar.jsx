@@ -4,6 +4,7 @@ const TABS = [
   { id: 'inicio', label: 'Início' },
   { id: 'explorar', label: 'Explorar' },
   { id: 'combos', label: 'Combos' },
+  { id: 'banca', label: 'Banca' },
   { id: 'favoritos', label: 'Favoritos' },
   { id: 'perfil', label: 'Perfil' },
 ];
