@@ -104,6 +104,15 @@ export function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
+// Bets are placed once a day, often late evening (the Ruben's routine:
+// checks around 23:00) — by then there's nothing meaningful left of
+// *today*, so tips are built from *tomorrow*'s fixtures instead.
+export function targetEventDateStr() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return tomorrow.toISOString().slice(0, 10);
+}
+
 // True once the bankroll has dropped below DRAWDOWN_THRESHOLD of where it
 // started — the point at which new tips stake at a reduced %.
 export function isDrawdownActive(state) {
@@ -122,9 +131,12 @@ export function generateDailyTips(events, state) {
   const effectivePercent = stakeReduced ? state.stakePercent * DRAWDOWN_STAKE_MULTIPLIER : state.stakePercent;
   const stake = Math.round(bankroll * (effectivePercent / 100) * 100) / 100;
 
+  const targetDate = targetEventDateStr();
+  const tomorrowsEvents = events.filter((event) => event.date === targetDate);
+
   const generators = [
-    { pool: 'segura', build: () => buildSafeCombo(events) },
-    { pool: 'valor', build: () => buildRiskyCombo(events, 7) },
+    { pool: 'segura', build: () => buildSafeCombo(tomorrowsEvents) },
+    { pool: 'valor', build: () => buildRiskyCombo(tomorrowsEvents, 7) },
   ];
 
   const newTips = generators

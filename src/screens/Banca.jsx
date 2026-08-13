@@ -89,9 +89,9 @@ export default function Banca() {
         </div>
       </div>
 
-      <h2 className="banca__section-title heading">Tips de hoje</h2>
+      <h2 className="banca__section-title heading">Tips de hoje (eventos de amanhã)</h2>
       {todayTips.length === 0 ? (
-        <p className="banca__empty">Sem eventos suficientes hoje para gerar tips.</p>
+        <p className="banca__empty">Sem eventos suficientes amanhã para gerar tips.</p>
       ) : (
         <div className="banca__tips">
           {todayTips.map((tip) => (
