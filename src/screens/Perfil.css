@@ -59,8 +59,9 @@
 .book-toggle {
   padding: 8px 14px;
   border: 1px solid var(--border);
+  border-radius: 999px;
   background: transparent;
-  color: rgba(29, 31, 32, 0.5);
+  color: var(--muted-2);
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
@@ -75,6 +76,7 @@
 .perfil__responsible {
   position: relative;
   border: 1px solid var(--border);
+  border-radius: 12px;
   padding: 16px;
   margin-bottom: 22px;
 }
@@ -87,13 +89,14 @@
 
 .perfil__responsible-text {
   font-size: 12px;
-  color: rgba(29, 31, 32, 0.65);
+  color: var(--muted);
   line-height: 1.55;
   margin: 0 0 12px;
 }
 
 .perfil__limits-button {
   border: 1px solid var(--border);
+  border-radius: 999px;
   background: transparent;
   padding: 8px 14px;
   font-weight: 600;
@@ -104,17 +107,18 @@
 .perfil__signout {
   width: 100%;
   border: 1px solid var(--border);
+  border-radius: 10px;
   background: transparent;
   padding: 10px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  color: #5d5d60;
+  color: var(--muted);
 }
 
 .perfil__footer {
   text-align: center;
   font-size: 11px;
-  color: rgba(29, 31, 32, 0.4);
+  color: var(--muted-2);
   margin-top: 16px;
 }

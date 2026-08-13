@@ -136,7 +136,7 @@ export default function Combos({
                 </div>
               </div>
               <div className="bet-row__stats">
-                <div className="bet-row__prob">+{bet.edge.toFixed(0)}pp</div>
+                <div className="bet-row__prob bet-row__prob--value">+{bet.edge.toFixed(0)}pp</div>
                 <div className="bet-row__odd heading">{bet.odd.toFixed(2)}</div>
               </div>
               <button
@@ -209,7 +209,7 @@ export default function Combos({
                   <div className="combo-leg__top">
                     <span className="combo-leg__event">{leg.event}</span>
                     <span className="combo-leg__top-right">
-                      <span className="combo-leg__tag">
+                      <span className={`combo-leg__tag${leg.tag === 'Valor' ? ' combo-leg__tag--value' : ''}`}>
                         {leg.tag} · {Math.round(leg.predProb * 100)}%
                       </span>
                       <button

@@ -1,7 +1,7 @@
 import './CornerCard.css';
 
-// Bordered card with four 11x11px "+" registration marks at each corner —
-// the recurring "blueprint" motif used across OddScout's cards.
+// Rounded card, plain border with a soft shadow — `highlighted` adds a gold
+// glow for emphasis (recommended bet, etc.).
 export default function CornerCard({ children, className = '', highlighted = false, onClick, ...rest }) {
   const classes = ['corner-card', highlighted ? 'corner-card--highlight' : '', className]
     .filter(Boolean)
@@ -16,10 +16,6 @@ export default function CornerCard({ children, className = '', highlighted = fal
 
   return (
     <div className={classes} onClick={onClick} onKeyDown={onClick ? handleKeyDown : undefined} {...rest}>
-      <i className="corner-tick corner-tick--tl" />
-      <i className="corner-tick corner-tick--tr" />
-      <i className="corner-tick corner-tick--bl" />
-      <i className="corner-tick corner-tick--br" />
       {children}
     </div>
   );

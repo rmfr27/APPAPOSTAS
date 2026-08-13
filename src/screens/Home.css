@@ -50,10 +50,10 @@
 
 .sport-chip {
   flex-shrink: 0;
-  border: 1px solid #5980a6;
+  border: 1px solid var(--accent);
   background: transparent;
   color: var(--accent-mid);
-  border-radius: 20px;
+  border-radius: 999px;
   padding: 7px 16px;
   font-size: 13px;
   font-weight: 500;
@@ -92,13 +92,16 @@
 .tag {
   font-size: 11px;
   padding: 3px 8px;
+  border-radius: 999px;
   background: var(--tag-bg);
   color: var(--tag-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .tag--value {
-  background: var(--accent-tint);
-  color: var(--accent-dark);
+  background: var(--positive-tint);
+  color: var(--positive);
   font-weight: 600;
 }
 

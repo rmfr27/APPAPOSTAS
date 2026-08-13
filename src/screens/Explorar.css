@@ -16,6 +16,7 @@
   font-size: 14px;
   background: var(--surface);
   border: 1px solid var(--border);
+  border-radius: 10px;
   margin-bottom: 20px;
 }
 
@@ -139,7 +140,7 @@
 
 .ranked-card__pred {
   font-size: 12px;
-  color: rgba(29, 31, 32, 0.7);
+  color: var(--muted);
 }
 
 .explorar__sport-label {
