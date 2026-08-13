@@ -44,7 +44,8 @@
 }
 
 .favoritos__empty {
-  border: 1px dashed rgba(29, 31, 32, 0.25);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
   padding: 32px 20px;
   text-align: center;
   font-size: 13px;
