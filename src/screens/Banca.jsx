@@ -9,6 +9,9 @@ import {
   setupBankroll,
   getCurrentBankroll,
   todayStr,
+  isDrawdownActive,
+  getStats,
+  DRAWDOWN_THRESHOLD,
 } from '../lib/bankroll.js';
 import './Banca.css';
 
@@ -45,6 +48,8 @@ export default function Banca() {
   const today = todayStr();
   const todayTips = state.tips.filter((tip) => tip.date === today);
   const pastTips = state.tips.filter((tip) => tip.date !== today);
+  const drawdown = isDrawdownActive(state);
+  const stats = getStats(state);
 
   function handleSettle(tipId, won) {
     persist(settleTip(state, tipId, won));
@@ -54,6 +59,13 @@ export default function Banca() {
     <div className="banca">
       <h1 className="banca__title heading">Banca</h1>
       <p className="banca__disclaimer">Ferramenta de disciplina e registo — não é garantia de lucro.</p>
+
+      {drawdown && (
+        <p className="banca__drawdown-banner">
+          Modo de proteção ativo — a banca está abaixo de {Math.round(DRAWDOWN_THRESHOLD * 100)}% da inicial, por
+          isso as tips de hoje usam metade do stake habitual até recuperar.
+        </p>
+      )}
 
       <div className="banca__stats">
         <div className="banca__stat">
@@ -88,6 +100,17 @@ export default function Banca() {
         </div>
       )}
 
+      {stats.overall.settled > 0 && (
+        <>
+          <h2 className="banca__section-title heading">Estatísticas</h2>
+          <div className="banca__stats-grid">
+            <StatRow label="Geral" stat={stats.overall} minSampleSize={stats.minSampleSize} />
+            <StatRow label="Segura" stat={stats.byPool.segura} minSampleSize={stats.minSampleSize} />
+            <StatRow label="Arriscada" stat={stats.byPool.valor} minSampleSize={stats.minSampleSize} />
+          </div>
+        </>
+      )}
+
       {pastTips.length > 0 && (
         <>
           <h2 className="banca__section-title heading">Histórico</h2>
@@ -107,7 +130,9 @@ function TipCard({ tip, onSettle }) {
     <CornerCard className="banca__tip-card">
       <div className="banca__tip-header">
         <span className="tag">{POOL_LABELS[tip.pool]}</span>
-        <span className="banca__tip-stake heading">{tip.stake.toFixed(2)}€</span>
+        <span className="banca__tip-stake heading">
+          {tip.stake.toFixed(2)}€{tip.stakeReduced ? ' (reduzido)' : ''}
+        </span>
       </div>
       <div className="combo-legs">
         {tip.legs.map((leg, index) => (
@@ -174,6 +199,34 @@ function HistoryRow({ tip }) {
       >
         {tip.status === 'pendente' ? 'Pendente' : `${effect >= 0 ? '+' : ''}${effect.toFixed(2)}€`}
       </span>
+    </div>
+  );
+}
+
+function StatRow({ label, stat, minSampleSize }) {
+  if (stat.settled === 0) return null;
+  return (
+    <div className="banca__stats-row">
+      <div className="banca__stats-row-top">
+        <span className="banca__stats-row-label heading">{label}</span>
+        <span className="banca__stats-row-count">
+          {stat.wins}/{stat.settled} acertos
+        </span>
+      </div>
+      <div className="banca__stats-row-bottom">
+        <span
+          className={`banca__stats-row-value ${stat.roi >= 0 ? 'banca__stats-row-value--positive' : 'banca__stats-row-value--negative'}`}
+        >
+          ROI {stat.roi >= 0 ? '+' : ''}
+          {(stat.roi * 100).toFixed(1)}%
+        </span>
+        <span className="banca__stats-row-value">Taxa de acerto {(stat.winRate * 100).toFixed(0)}%</span>
+      </div>
+      {stat.lowSample && (
+        <p className="banca__stats-row-caveat">
+          Amostra ainda pequena ({stat.settled}/{minSampleSize}+) — estes números ainda não são conclusivos.
+        </p>
+      )}
     </div>
   );
 }

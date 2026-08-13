@@ -15,6 +15,17 @@
   margin: 0 0 20px;
 }
 
+.banca__drawdown-banner {
+  font-size: 12px;
+  color: var(--negative);
+  background: var(--negative-tint);
+  border: 1px solid var(--negative);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
 .banca__stats {
   display: flex;
   gap: 10px;
@@ -175,6 +186,60 @@
 
 .banca__history-effect--negative {
   color: var(--negative);
+}
+
+.banca__stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.banca__stats-row {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.banca__stats-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.banca__stats-row-label {
+  font-size: 15px;
+}
+
+.banca__stats-row-count {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.banca__stats-row-bottom {
+  display: flex;
+  gap: 16px;
+}
+
+.banca__stats-row-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.banca__stats-row-value--positive {
+  color: var(--positive);
+}
+
+.banca__stats-row-value--negative {
+  color: var(--negative);
+}
+
+.banca__stats-row-caveat {
+  font-size: 11px;
+  color: var(--muted-2);
+  margin: 6px 0 0;
 }
 
 .banca__setup {

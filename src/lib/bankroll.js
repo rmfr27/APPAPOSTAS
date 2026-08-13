@@ -28,6 +28,18 @@ const EMPTY_STATE = {
   tips: [],
 };
 
+// Safety throttle, not a "strategy" — it only ever shrinks stakes after
+// losses, never grows them after wins. If the bankroll falls below 70% of
+// where it started, new tips stake at half the usual %, until it recovers.
+// This is the opposite of chasing losses (martingale-style stake escalation
+// is exactly what this project explicitly will not build).
+export const DRAWDOWN_THRESHOLD = 0.7;
+export const DRAWDOWN_STAKE_MULTIPLIER = 0.5;
+
+// Minimum settled tips before win-rate/ROI numbers are treated as meaningful
+// rather than noise — see getStats().
+const MIN_SAMPLE_SIZE = 20;
+
 export function loadBankrollState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -66,6 +78,13 @@ export function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
+// True once the bankroll has dropped below DRAWDOWN_THRESHOLD of where it
+// started — the point at which new tips stake at a reduced %.
+export function isDrawdownActive(state) {
+  if (!state.startingBankroll) return false;
+  return getCurrentBankroll(state) < state.startingBankroll * DRAWDOWN_THRESHOLD;
+}
+
 // Idempotent — safe to call on every visit to the Banca screen. Only
 // generates a new pair when today doesn't already have tips.
 export function generateDailyTips(events, state) {
@@ -73,7 +92,9 @@ export function generateDailyTips(events, state) {
   if (state.tips.some((tip) => tip.date === today)) return state;
 
   const bankroll = getCurrentBankroll(state);
-  const stake = Math.round(bankroll * (state.stakePercent / 100) * 100) / 100;
+  const stakeReduced = isDrawdownActive(state);
+  const effectivePercent = stakeReduced ? state.stakePercent * DRAWDOWN_STAKE_MULTIPLIER : state.stakePercent;
+  const stake = Math.round(bankroll * (effectivePercent / 100) * 100) / 100;
 
   const generators = [
     { pool: 'segura', build: () => generateCombo(events, 'segura', 4) },
@@ -92,6 +113,7 @@ export function generateDailyTips(events, state) {
         totalOdd: Number(combo.totalOdd),
         totalProb: combo.totalProb,
         stake,
+        stakeReduced,
         status: 'pendente',
         settledAt: null,
       };
@@ -114,4 +136,36 @@ export function settleTip(state, tipId, won) {
 
 export function setupBankroll(state, startingBankroll, stakePercent) {
   return { ...state, startingBankroll, stakePercent };
+}
+
+function summarize(tips) {
+  const settled = tips.filter((tip) => tip.status !== 'pendente');
+  const wins = settled.filter((tip) => tip.status === 'ganhou');
+  const totalStaked = settled.reduce((sum, tip) => sum + tip.stake, 0);
+  const profit = settled.reduce(
+    (sum, tip) => sum + (tip.status === 'ganhou' ? tip.stake * (tip.totalOdd - 1) : -tip.stake),
+    0,
+  );
+  return {
+    settled: settled.length,
+    wins: wins.length,
+    winRate: settled.length > 0 ? wins.length / settled.length : null,
+    profit,
+    roi: totalStaked > 0 ? profit / totalStaked : null,
+    lowSample: settled.length < MIN_SAMPLE_SIZE,
+  };
+}
+
+// Win rate / ROI per pool, plus overall — each flagged with `lowSample` below
+// MIN_SAMPLE_SIZE settled tips so the UI can caveat numbers that aren't
+// meaningful yet instead of presenting early noise as a trend.
+export function getStats(state) {
+  return {
+    overall: summarize(state.tips),
+    byPool: {
+      segura: summarize(state.tips.filter((tip) => tip.pool === 'segura')),
+      valor: summarize(state.tips.filter((tip) => tip.pool === 'valor')),
+    },
+    minSampleSize: MIN_SAMPLE_SIZE,
+  };
 }
