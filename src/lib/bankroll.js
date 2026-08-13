@@ -161,6 +161,20 @@ export function generateDailyTips(events, state) {
   return { ...state, tips: [...newTips, ...state.tips] };
 }
 
+// Manual override for generateDailyTips' idempotency — lets today's pair be
+// rebuilt (e.g. after a scoring-logic change deployed mid-day, or the Ruben
+// just wants a different pair). Refuses if any of today's tips already has
+// a result: settled tips are a permanent record and are never discarded,
+// even to make room for a fresh pair.
+export function regenerateDailyTips(events, state) {
+  const today = todayStr();
+  const todayTips = state.tips.filter((tip) => tip.date === today);
+  if (todayTips.some((tip) => tip.status !== 'pendente')) return state;
+
+  const withoutToday = { ...state, tips: state.tips.filter((tip) => tip.date !== today) };
+  return generateDailyTips(events, withoutToday);
+}
+
 export function settleTip(state, tipId, won) {
   return {
     ...state,

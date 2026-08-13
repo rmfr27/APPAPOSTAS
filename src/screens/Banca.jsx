@@ -5,6 +5,7 @@ import {
   loadBankrollState,
   saveBankrollState,
   generateDailyTips,
+  regenerateDailyTips,
   settleTip,
   setupBankroll,
   getCurrentBankroll,
@@ -51,6 +52,12 @@ export default function Banca() {
   const drawdown = isDrawdownActive(state);
   const stats = getStats(state);
 
+  const canRegenerate = todayTips.length > 0 && todayTips.every((tip) => tip.status === 'pendente');
+
+  function handleRegenerate() {
+    persist(regenerateDailyTips(events, state));
+  }
+
   function handleSettle(tipId, won) {
     persist(settleTip(state, tipId, won));
   }
@@ -89,7 +96,14 @@ export default function Banca() {
         </div>
       </div>
 
-      <h2 className="banca__section-title heading">Tips de hoje (eventos de amanhã)</h2>
+      <div className="banca__section-header">
+        <h2 className="banca__section-title heading">Tips de hoje (eventos de amanhã)</h2>
+        {canRegenerate && (
+          <button type="button" className="banca__regenerate-btn" onClick={handleRegenerate}>
+            ↻ Gerar novas
+          </button>
+        )}
+      </div>
       {todayTips.length === 0 ? (
         <p className="banca__empty">Sem eventos suficientes amanhã para gerar tips.</p>
       ) : (
