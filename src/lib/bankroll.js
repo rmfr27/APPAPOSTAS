@@ -1,4 +1,4 @@
-import { generateCombo, getValueBets, makeComboLeg, comboTotals } from './predictions.js';
+import { getSafeBets, getValueBets, makeComboLeg, comboTotals } from './predictions.js';
 
 const STORAGE_KEY = 'oddscout_bankroll_v1';
 
@@ -18,6 +18,32 @@ function buildRiskyCombo(events, count) {
     used.add(event.id);
     legs.push(makeComboLeg(event, bet, 'Valor'));
     if (legs.length >= count) break;
+  }
+  return { legs, ...comboTotals(legs) };
+}
+
+const MIN_SAFE_LEGS = 4;
+const MAX_SAFE_LEGS = 10;
+const MIN_SAFE_COMBO_ODD = 1.3;
+
+// getSafeBets already picks, per event, whichever >=80%-confidence outcome
+// has the best odd — but sorted by probability, the top 4 skew toward
+// near-certainties (odds around 1.00 each), which can combine to a total
+// odd barely above 1 (seen in testing: 1.03). Sorting by odd first picks
+// the safe bets that are still worth combining; if 4 of those still don't
+// clear MIN_SAFE_COMBO_ODD, keep adding (safe) legs up to MAX_SAFE_LEGS.
+function buildSafeCombo(events) {
+  const candidates = [...getSafeBets(events)].sort((a, b) => b.bet.odd - a.bet.odd);
+
+  const used = new Set();
+  const legs = [];
+  for (const { event, bet } of candidates) {
+    if (used.has(event.id)) continue;
+    used.add(event.id);
+    legs.push(makeComboLeg(event, bet, 'Segura'));
+    const { totalOdd } = comboTotals(legs);
+    if (legs.length >= MIN_SAFE_LEGS && Number(totalOdd) > MIN_SAFE_COMBO_ODD) break;
+    if (legs.length >= MAX_SAFE_LEGS) break;
   }
   return { legs, ...comboTotals(legs) };
 }
@@ -97,7 +123,7 @@ export function generateDailyTips(events, state) {
   const stake = Math.round(bankroll * (effectivePercent / 100) * 100) / 100;
 
   const generators = [
-    { pool: 'segura', build: () => generateCombo(events, 'segura', 4) },
+    { pool: 'segura', build: () => buildSafeCombo(events) },
     { pool: 'valor', build: () => buildRiskyCombo(events, 7) },
   ];
 
