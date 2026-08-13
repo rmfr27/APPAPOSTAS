@@ -5,6 +5,7 @@ import Explorar from './screens/Explorar.jsx';
 import Eventos from './screens/Eventos.jsx';
 import Detalhe from './screens/Detalhe.jsx';
 import Combos from './screens/Combos.jsx';
+import Banca from './screens/Banca.jsx';
 import Favoritos from './screens/Favoritos.jsx';
 import Perfil from './screens/Perfil.jsx';
 import Placeholder from './screens/Placeholder.jsx';
@@ -112,6 +113,8 @@ function App() {
             onComboChange={setCombo}
           />
         );
+      case 'banca':
+        return <Banca />;
       case 'favoritos':
         return (
           <Favoritos

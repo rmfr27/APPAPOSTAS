@@ -9,6 +9,8 @@
   --accent-darkest: #fbe9b8;
   --positive: #2fae6a;
   --positive-tint: rgba(47, 174, 106, 0.14);
+  --negative: #d9534f;
+  --negative-tint: rgba(217, 83, 79, 0.14);
   --border: rgba(255, 255, 255, 0.1);
   --muted: rgba(245, 244, 239, 0.62);
   --muted-2: rgba(245, 244, 239, 0.46);
